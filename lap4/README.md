@@ -76,4 +76,4 @@ Hai giá trị hash phải giống nhau.
 - Thread pool 4 worker, giới hạn header 16 KB và request body 1 MB.
 - Mini Browser có History trong phiên chạy, xem status/header và tải file.
 
-Không hỗ trợ HTTPS, keep-alive, chunked encoding, JavaScript engine hoặc website Internet tùy ý. `JEditorPane` chỉ hiển thị HTML cơ bản.
+Không hỗ trợ HTTPS, keep-alive, chunked encoding hoặc website Internet tùy ý. Vùng nội dung hiển thị body text/HTML dạng source; tài nguyên nhị phân được tải xuống để không làm hỏng byte.

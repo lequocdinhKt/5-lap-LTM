@@ -11,7 +11,7 @@
 Chạy server trước, sau đó:
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab2.test.FtpIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab2.test.FtpIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test đăng nhập, upload, LIST, download, so sánh byte và xóa file.
@@ -25,6 +25,6 @@ Test đăng nhập, upload, LIST, download, so sánh byte và xóa file.
 - `CWD ..`, tên chứa `../` và symbolic link không thoát root.
 - FileZilla thật ở passive mode.
 
-## Sau khi đổi JavaFX
+## JavaFX
 
-Giữ integration test độc lập UI. Bổ sung test service/progress và kiểm tra UI không treo khi transfer; build phải chạy được khi không có màn hình đồ họa.
+Integration test vẫn độc lập UI. UI dùng `Task`/executor; kiểm tra thủ công progress upload/download, resize SplitPane và đóng cửa sổ trong lúc đã kết nối.

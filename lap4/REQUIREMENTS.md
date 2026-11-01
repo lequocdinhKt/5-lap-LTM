@@ -19,7 +19,7 @@
 - Browser và `curl` nhận đúng GET/HEAD/POST.
 - File download có hash giống file server; HEAD không có body.
 - Path traversal bị chặn; request lỗi không làm server dừng.
-- UI mục tiêu chuyển từ Swing sang JavaFX và co giãn.
+- UI JavaFX có top bar/sidebar và co giãn theo cửa sổ.
 
 ## Ngoài phạm vi
 

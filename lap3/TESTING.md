@@ -9,7 +9,7 @@
 ## Integration test localhost
 
 ```powershell
-.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=LocalMailIntegrationTest" "-Dexec.classpathScope=test"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab3.LocalMailIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test tự khởi động GreenMail, gửi SMTP từ user1, đọc POP3 user2 và kiểm tra subject/body. Đây là test bắt buộc trong `verify-all.ps1`.

@@ -27,4 +27,4 @@ Dừng server cũ; không mở hai FTP Server cùng port. Với PASV, kiểm tra
 
 ## UI treo
 
-Transfer phải chạy background; Swing hiện tại dùng `SwingWorker`, JavaFX mục tiêu phải dùng `Task`/executor và chỉ cập nhật UI trên JavaFX thread.
+Transfer phải chạy qua `FtpClientApp.runTask()` trên executor; chỉ cập nhật control trong JavaFX Application Thread.

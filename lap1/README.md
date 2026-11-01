@@ -45,11 +45,11 @@ Tài khoản lưu trong **MySQL**, nhóm chỉ lưu trong **RAM** (làm mới kh
 
 | Thư mục | Vai trò |
 |---------|---------|
-| [`src/lab1/common/`](src/lab1/common) | Hằng số giao thức, gói tin UDP, kiểu dữ liệu dùng chung |
-| [`src/lab1/server/`](src/lab1/server) | Server TCP, relay UDP file, broadcaster UDP text, UI server |
-| [`src/lab1/client/`](src/lab1/client) | API mạng client, nhận UDP, UI chat |
-| [`src/lab1/db/`](src/lab1/db) | Lưu tài khoản trong MySQL |
-| [`src/lab1/test/`](src/lab1/test) | Kiểm thử tích hợp và bot demo tự động |
+| [`src/main/java/lab1/common/`](src/main/java/lab1/common) | Hằng số giao thức, gói tin UDP, kiểu dữ liệu dùng chung |
+| [`src/main/java/lab1/server/`](src/main/java/lab1/server) | Server TCP, relay UDP file, broadcaster UDP text, UI server |
+| [`src/main/java/lab1/client/`](src/main/java/lab1/client) | API mạng client, nhận UDP, UI chat |
+| [`src/main/java/lab1/db/`](src/main/java/lab1/db) | Lưu tài khoản trong MySQL |
+| [`src/test/java/lab1/test/`](src/test/java/lab1/test) | Kiểm thử tích hợp và bot demo tự động |
 
 Chi tiết từng file xem tại [`KIEN_THUC_LAP_TRINH_MANG.md`](KIEN_THUC_LAP_TRINH_MANG.md).
 
@@ -89,7 +89,7 @@ Xem kịch bản trình bày tại [`HUONG_DAN_DEMO.md`](HUONG_DAN_DEMO.md).
 ## Kiểm thử tích hợp
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Kết quả cuối:

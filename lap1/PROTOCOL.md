@@ -10,7 +10,7 @@
 
 ## TCP framing
 
-`DataInputStream`/`DataOutputStream` truyền một frame name từ `Protocol`, sau đó là các field theo đúng thứ tự của frame. Danh sách được ghi bằng số lượng trước rồi từng chuỗi UTF-8. Các frame thực tế phải xem tại `src/lab1/common/Protocol.java`.
+`DataInputStream`/`DataOutputStream` truyền một frame name từ `Protocol`, sau đó là các field theo đúng thứ tự của frame. Danh sách được ghi bằng số lượng trước rồi từng chuỗi UTF-8. Các frame thực tế phải xem tại `src/main/java/lab1/common/Protocol.java`.
 
 Luồng phiên rút gọn:
 

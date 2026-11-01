@@ -32,6 +32,6 @@ flowchart LR
 3. Chat riêng đi qua TCP; chat nhóm/tất cả được server phát qua UDP.
 4. File được báo hiệu bằng TCP, truyền chunk qua UDP và xác nhận ACK/retry.
 
-## Hướng chuẩn hóa sau tài liệu
+## Cấu trúc Maven
 
-Giữ nguyên hành vi, sau đó di chuyển về `src/main/java/lab1/{model,network,service,ui}` và `src/test/java/lab1`. Không refactor protocol và UI trong cùng một commit.
+Source chính nằm tại `src/main/java/lab1`; integration test và bot demo nằm tại `src/test/java/lab1/test`. Các package `client`, `server`, `common`, `db` được giữ vì phản ánh trực tiếp kiến trúc Chat Client–Server.

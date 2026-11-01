@@ -52,7 +52,7 @@ nền TCP Socket bằng Java.**
 
 ### 2.2. Mini Web Browser / Client
 
-Tạo giao diện tối giản bằng **Java Swing**. Đây không phải trình duyệt
+Tạo giao diện tối giản bằng **JavaFX**. Đây không phải trình duyệt
 hiện đại đầy đủ; chỉ cần đáp ứng mục tiêu thực hành HTTP.
 
 -   Ô nhập URL, ví dụ `http://localhost:8080/`.
@@ -65,13 +65,13 @@ hiện đại đầy đủ; chỉ cần đáp ứng mục tiêu thực hành HTT
 -   Back/Forward là chức năng nên có nếu không làm tăng độ phức tạp quá
     nhiều.
 -   Download tài nguyên nhị phân bằng cách lưu response body vào file,
-    dùng `JFileChooser`.
+    dùng JavaFX `FileChooser`.
 -   Xử lý lỗi kết nối, URL không hợp lệ và lỗi response bằng thông báo
     dễ hiểu.
 
-**Giới hạn có chủ đích:** `JEditorPane` chỉ hiển thị HTML đơn giản,
-không phải trình duyệt đầy đủ và không hỗ trợ đầy đủ JavaScript/CSS hiện
-đại. PDF, MP3, MP4 có thể được tải xuống; không cần tự xây dựng trình
+**Giới hạn có chủ đích:** JavaFX `WebView` chỉ hiển thị body do
+`RawHttpClient` nhận, không tự thay thế phần giao thức và không phải trình
+duyệt Internet đầy đủ. PDF, MP3, MP4 có thể được tải xuống; không cần tự xây dựng trình
 xem PDF hoặc trình phát media.
 
 ### 2.3. Không làm trong phiên bản đầu
@@ -89,7 +89,7 @@ quản lý.
 -   Java 17 trở lên (ưu tiên JDK 17 hoặc 21).
 -   Java Socket API: `ServerSocket`, `Socket`, `InputStream`,
     `OutputStream`.
--   Java Swing cho giao diện client.
+-   JavaFX cho giao diện client.
 -   Không dùng thư viện HTTP cấp cao để phân tích/gửi request hoặc tạo
     response.
 -   Có thể dùng các thư viện chuẩn của JDK cho tiện ích không thay thế
@@ -143,9 +143,8 @@ quản lý.
 -   Server nên chuẩn hóa/kiểm tra path để ngăn path traversal như
     `../../...`; chỉ cho phép đọc file bên trong thư mục `www`.
 -   Đóng socket/stream đúng cách bằng `try-with-resources`.
--   Không để tác vụ mạng chạy lâu trực tiếp trên Swing Event Dispatch
-    Thread; dùng `SwingWorker` hoặc worker thread để giao diện không bị
-    treo.
+-   Không để tác vụ mạng chạy lâu trực tiếp trên JavaFX Application
+    Thread; dùng `Task` và worker executor để giao diện không bị treo.
 -   Nếu POST gửi `application/x-www-form-urlencoded`, cần đọc body theo
     `Content-Length` và giải mã form data đúng cách.
 -   Bài tập chỉ hỗ trợ một tập con rõ ràng của HTTP/1.1; ghi giới hạn
@@ -155,21 +154,21 @@ quản lý.
 ## 5. Cấu trúc thư mục đề xuất
 
 ``` text
-Lab4MiniWeb/
-├── src/
-│   └── lab4/
-│       ├── server/
-│       │   ├── MiniWebServer.java
-│       │   ├── ClientHandler.java
-│       │   ├── HttpRequest.java
-│       │   ├── HttpResponse.java
-│       │   ├── FileService.java
-│       │   └── MimeTypes.java
-│       └── client/
-│           ├── MiniBrowser.java
-│           ├── RawHttpClient.java
-│           ├── BrowserHistory.java
-│           └── DownloadService.java
+lap4/
+├── src/main/
+│   ├── java/lab4/
+│   │   ├── server/
+│   │   │   ├── MiniWebServer.java
+│   │   │   ├── ClientHandler.java
+│   │   │   ├── HttpRequest.java
+│   │   │   ├── HttpResponse.java
+│   │   │   ├── FileService.java
+│   │   │   └── MimeTypes.java
+│   │   ├── client/RawHttpClient.java
+│   │   ├── model/BrowserHistory.java
+│   │   └── ui/MiniBrowserApp.java
+│   └── resources/css/lab4.css
+├── src/test/java/lab4/test/HttpIntegrationTest.java
 ├── www/
 │   ├── index.html
 │   └── files/
@@ -206,8 +205,8 @@ phần giao thức HTTP dễ kiểm thử.
 
   `MimeTypes`                         Ánh xạ phần mở rộng sang MIME type
 
-  `MiniBrowser`                       Giao diện Swing và sự kiện người
-                                      dùng
+  `MiniBrowserApp`                    Giao diện JavaFX và sự kiện người
+                                      dùng; request chạy trên worker
 
   `RawHttpClient`                     Tạo TCP socket, gửi HTTP request và
                                       phân tích HTTP response
@@ -215,7 +214,7 @@ phần giao thức HTTP dễ kiểm thử.
   `BrowserHistory`                    Quản lý danh sách URL và vị trí
                                       Back/Forward nếu có
 
-  `DownloadService`                   Lưu response body ra file
+  `HttpIntegrationTest`               Kiểm tra GET/HEAD/POST và lỗi HTTP
   -----------------------------------------------------------------------
 
 ## 6. Ví dụ endpoint và request
@@ -298,7 +297,7 @@ không sao chép một giá trị cố định từ ví dụ nếu body thay đ�
 -   Xử lý response có body nhị phân.
 -   Kiểm thử bằng console trước khi làm giao diện.
 
-### Giai đoạn 4 --- Mini Browser Swing
+### Giai đoạn 4 --- Mini Browser JavaFX
 
 -   URL bar và nút Go.
 -   Hiển thị HTML cơ bản.
@@ -401,7 +400,7 @@ sau:
 1.  Kiểm tra cấu trúc dự án và các file đã tồn tại trước khi sửa.
 2.  Không giả định code đã có; nếu chưa có, tạo từng phần theo giai
     đoạn.
-3.  Giữ dự án đơn giản, dùng Java Socket API và Swing; không đưa
+3.  Giữ dự án đơn giản, dùng Java Socket API và JavaFX; không đưa
     framework web hoặc thư viện HTTP cấp cao vào.
 4.  Giải thích ngắn gọn mục đích của mỗi lớp và những quyết định kỹ
     thuật quan trọng.
@@ -413,7 +412,7 @@ sau:
 8.  Tính `Content-Length` bằng số byte; bảo toàn byte của file.
 9.  Xử lý ranh giới header/body và `Content-Length` cẩn thận; không giả
     định một lần `read()` nhận đủ request.
-10. Giữ xử lý mạng khỏi Swing Event Dispatch Thread.
+10. Giữ xử lý mạng khỏi JavaFX Application Thread.
 11. Không báo test thành công nếu chưa chạy test.
 12. Khi hoàn tất một giai đoạn, hãy báo: file đã tạo/sửa, chức năng hoàn
     thành, lệnh chạy, cách kiểm thử và vấn đề còn tồn tại.
@@ -430,7 +429,7 @@ sau:
 -   [ ] GET, HEAD, POST hoạt động theo phạm vi đã mô tả.
 -   [ ] Server trả HTML và các file PDF/MP3/MP4.
 -   [ ] Client tự gửi và phân tích HTTP bằng TCP Socket.
--   [ ] Mini Browser có giao diện Swing.
+-   [x] Mini Browser có giao diện JavaFX.
 -   [ ] History và download hoạt động.
 -   [ ] Có xử lý lỗi 404/405 và lỗi kết nối cơ bản.
 -   [ ] Các file nhị phân tải xuống không bị thay đổi.

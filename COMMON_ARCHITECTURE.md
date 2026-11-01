@@ -1,6 +1,6 @@
 # Kiến trúc chung
 
-## Cấu trúc mục tiêu
+## Cấu trúc đã áp dụng
 
 Mỗi lab là một Maven project độc lập:
 
@@ -12,17 +12,16 @@ lapN/
 └── src/
     ├── main/
     │   ├── java/labN/
-    │   │   ├── App.java
-    │   │   ├── config/
-    │   │   ├── model/
-    │   │   ├── network/
-    │   │   ├── service/
+    │   │   ├── client/          # khi lab có client protocol riêng
+    │   │   ├── server/          # khi lab có server riêng
+    │   │   ├── model/ hoặc common/
+    │   │   ├── network/ hoặc service/
     │   │   └── ui/
     │   └── resources/{css,icons,fonts,views}/
     └── test/java/labN/
 ```
 
-Đây là cấu trúc mục tiêu. Code hiện tại còn dùng `src/` tùy chỉnh; việc di chuyển phải thực hiện riêng từng lab và build/test sau mỗi bước.
+Lab 1–4 đã dùng Maven layout này. Package con được giữ ở mức tối thiểu theo vai trò thật của từng bài; không tạo package rỗng chỉ để giống hình thức.
 
 ## Trách nhiệm
 

@@ -2,7 +2,7 @@
 
 ```mermaid
 flowchart LR
-    UI[FileZillaFrame hiện tại / JavaFX mục tiêu] --> C[FtpClientSession]
+    UI[FtpClientApp JavaFX] --> C[FtpClientSession]
     C -- control TCP 2121 --> H[ControlHandler]
     C -- data TCP PASV/PORT --> D[DataChannel]
     H --> D
@@ -13,7 +13,7 @@ flowchart LR
 
 ## Thành phần
 
-- `FileZillaFrame`: UI Swing hiện tại; sẽ được thay bằng JavaFX nhưng giữ hành vi.
+- `FtpClientApp`: UI JavaFX, trạng thái kết nối, progress transfer, toast và thao tác nền.
 - `FtpClientSession`: gửi lệnh, đọc reply và mở data connection.
 - `FtpServer`: accept control connection, tạo `ControlHandler` trong thread pool.
 - `ControlHandler`: state machine phiên FTP và dispatch lệnh.
@@ -28,6 +28,6 @@ flowchart LR
 4. Server trả `150`, đọc byte từ data socket, đóng data socket và trả `226`.
 5. Server ghi `transfer_logs`.
 
-## Hướng chuẩn hóa
+## Cấu trúc Maven
 
-Di chuyển source/test về Maven chuẩn trước. Sau khi integration test xanh mới thay `FileZillaFrame` bằng JavaFX view/controller/service; `FtpClientSession` không phụ thuộc JavaFX.
+Source nằm tại `src/main/java/lab2`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab2/test`. `FtpClientSession` không phụ thuộc JavaFX nên integration test kiểm tra protocol độc lập UI.

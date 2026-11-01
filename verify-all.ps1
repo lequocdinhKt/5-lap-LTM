@@ -24,9 +24,20 @@ if ($failed.Count -gt 0) {
 Write-Host "`n===== LAB 3 LOCAL SMTP/POP3 TEST =====" -ForegroundColor Cyan
 Push-Location "lap3"
 try {
-    & .\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=LocalMailIntegrationTest" "-Dexec.classpathScope=test"
+    & .\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab3.LocalMailIntegrationTest" "-Dexec.classpathScope=test"
     if ($LASTEXITCODE -ne 0) {
         throw "Kiểm thử SMTP/POP3 của lab3 thất bại."
+    }
+} finally {
+    Pop-Location
+}
+
+Write-Host "`n===== LAB 4 HTTP INTEGRATION TEST =====" -ForegroundColor Cyan
+Push-Location "lap4"
+try {
+    & .\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab4.test.HttpIntegrationTest" "-Dexec.classpathScope=test"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Kiểm thử HTTP của lab4 thất bại."
     }
 } finally {
     Pop-Location

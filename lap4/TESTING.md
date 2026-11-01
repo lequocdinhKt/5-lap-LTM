@@ -27,9 +27,13 @@ Get-FileHash .\www\files\document.pdf
 Get-FileHash .\downloaded.pdf
 ```
 
-## Khoảng trống cần hoàn thiện
+## Automated integration test
 
-Hiện chưa có automated integration test cho HTTP. Cần thêm test khởi động server bằng port ngẫu nhiên, gọi `RawHttpClient` cho GET/HEAD/POST/404/405/path traversal và đóng server sau test. Test phải độc lập UI.
+```powershell
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab4.test.HttpIntegrationTest" "-Dexec.classpathScope=test"
+```
+
+Test dùng web root/port tạm và kiểm tra GET, HEAD, POST, 404, 405, path traversal rồi tự đóng server. Test độc lập UI.
 
 ## Test hai máy
 

@@ -7,9 +7,9 @@ Repository gồm năm bài thực hành môn Lập trình mạng. Bài được 
 | Lab | Bài toán | Yêu cầu trọng tâm | Hiện trạng |
 |---|---|---|---|
 | 1 | Chat Client–Server | 5–6 client, TCP/UDP, multicast, broadcast, emoji, đính kèm | Có code, JavaFX |
-| 2 | FTP Server + Client | FTP, database server, tương thích FileZilla | Có code, client Swing cần chuyển JavaFX |
+| 2 | FTP Server + Client | FTP, database server, tương thích FileZilla | Có code, client JavaFX |
 | 3 | Mail Client + local server | SMTP, POP3, Gmail và localhost, database | Có code, JavaFX |
-| 4 | Web Server + Browser | HTTP, GET/HEAD/POST, history, download, media | Có code, browser Swing cần chuyển JavaFX |
+| 4 | Web Server + Browser | HTTP, GET/HEAD/POST, history, download, media | Có code, browser JavaFX |
 | 5 | RMI đồng bộ hai server | Hai server máy thật, client máy ảo | Chờ code từ thành viên khác |
 
 ## Quyết định chung

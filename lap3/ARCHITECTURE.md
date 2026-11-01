@@ -12,7 +12,7 @@ flowchart LR
 
 ## Thành phần
 
-- `Main`: khởi tạo JavaFX stage, view, service và controller.
+- `MailApp`: khởi tạo JavaFX stage, view, service và controller.
 - `MailAppView`: tạo control và phát sự kiện form.
 - `MailAppController`: validate luồng UI, chạy `Task` nền và hiển thị kết quả.
 - `AppService`: phiên ứng dụng, use case đăng ký/login/gửi/đọc mail.
@@ -28,6 +28,6 @@ flowchart LR
 
 `handleRead()` → `AppService.readMails()` → `MailProtocol.readMails()` → POP3/POP3S → `MailAppView.showInbox()`.
 
-## Hướng chuẩn hóa
+## Cấu trúc Maven
 
-Đưa package về `lab3.*`, Maven layout chuẩn và tách config trước khi cải thiện design system. Không để Jakarta Mail hoặc MySQL type lọt vào view.
+Source dùng namespace `lab3.*` tại `src/main/java/lab3`; test tại `src/test/java/lab3`. Jakarta Mail và MySQL không xuất hiện trong view.

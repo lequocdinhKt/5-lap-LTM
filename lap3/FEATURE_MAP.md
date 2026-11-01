@@ -2,7 +2,7 @@
 
 | Chức năng | UI/controller | Service | Network/database |
 |---|---|---|---|
-| Khởi động app | `Main.start()` | `new AppService()` | có thể tạo `LocalMailServer` nhúng |
+| Khởi động app | `MailApp.start()` | `new AppService()` | có thể tạo `LocalMailServer` nhúng |
 | Đăng ký | `MailAppController.handleRegister()` | `AppService.register()` | `MySqlDB.registerUser()` |
 | Đăng nhập | `handleLogin()` | `AppService.login()` | `MySqlDB.loginUser()` |
 | Đăng xuất | `handleLogout()` | `AppService.logout()` | — |

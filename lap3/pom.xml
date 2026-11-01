@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21.0.2</javafx.version>
         <mysql.version>9.5.0</mysql.version>
-        <app.mainClass>Main</app.mainClass>
+        <app.mainClass>lab3.MailApp</app.mainClass>
     </properties>
 
     <dependencies>
@@ -40,8 +40,6 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>tests</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -15,7 +15,7 @@ Repository dùng một quy ước chung cho hai máy Windows:
 
 - Temurin JDK 21 x64 trên cả hai máy; mã nguồn biên dịch ở mức Java 17.
 - Mỗi lab là một Maven project độc lập và có Maven Wrapper riêng.
-- MySQL 8.4.13 chạy bằng Docker; ứng dụng Java/JavaFX/Swing chạy trực tiếp trên Windows.
+- MySQL 8.4.13 chạy bằng Docker; toàn bộ ứng dụng giao diện dùng JavaFX và chạy trực tiếp trên Windows.
 - Không dùng file `.class`, `target`, `out` hoặc JAR được build từ máy khác.
 
 ## Cài lần đầu trên mỗi máy

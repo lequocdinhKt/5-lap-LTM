@@ -2,7 +2,7 @@
 
 ```mermaid
 flowchart LR
-    UI[MiniBrowser hiện tại / JavaFX mục tiêu] --> C[RawHttpClient]
+    UI[MiniBrowserApp JavaFX] --> C[RawHttpClient]
     C -- TCP 8080 + HTTP/1.1 --> S[MiniWebServer]
     S --> H[ClientHandler]
     H --> Q[HttpRequest.parse]
@@ -24,9 +24,11 @@ flowchart LR
 ## Client
 
 - `RawHttpClient`: tạo request raw, parse response và trả `Response`.
-- `BrowserHistory`: lịch sử URL trong phiên.
-- `MiniBrowser`: UI Swing hiện tại; cần thay bằng JavaFX nhưng giữ client độc lập UI.
+- `BrowserHistory`: model lịch sử URL trong phiên.
+- `MiniBrowserApp`: UI JavaFX có top bar, sidebar history/POST, vùng xem body, loading và toast.
 
-## Hướng chuẩn hóa
+## Cấu trúc Maven
 
-Di chuyển Maven layout và thêm automated integration test trước. Sau đó chuyển UI, rồi cải thiện `FileService` để stream media thay vì giữ toàn bộ byte trong RAM.
+Source nằm tại `src/main/java/lab4`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab4/test`. `RawHttpClient` và integration test không phụ thuộc JavaFX.
+
+`FileService` hiện vẫn đọc toàn bộ resource vào RAM; streaming media là bước tối ưu riêng sau khi UI/protocol ổn định.

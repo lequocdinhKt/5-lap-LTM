@@ -11,7 +11,7 @@
 Khởi động MySQL theo README, sau đó:
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test cần giữ: xác thực, nhiều client, chat TCP, multicast/broadcast, quản lý nhóm và truyền file so sánh byte.
@@ -24,6 +24,6 @@ Test cần giữ: xác thực, nhiều client, chat TCP, multicast/broadcast, qu
 - Kiểm tra client ngoài nhóm không nhận multicast của nhóm.
 - Ngắt một receiver trong lúc chuyển file; UI phải báo lỗi, không treo.
 
-## Sau khi chuẩn hóa
+## Cấu trúc test
 
-Chuyển test sang `src/test/java`, dùng JUnit cho unit/service test và giữ một integration test có thể chạy bằng script. `verify-all.ps1` phải gọi được kiểm tra không tương tác.
+Integration test đã nằm trong `src/test/java`. Test cần MySQL nên chạy riêng sau khi `setup-windows.ps1` hoàn tất; build thông thường vẫn không phụ thuộc UI.

@@ -20,6 +20,6 @@ echo Dang chay Lab 3 - Mail Client...
 call "%~dp0mvnw.cmd" -q javafx:run
 if errorlevel 1 (
   echo.
-  echo Neu loi, mo project bang IntelliJ IDEA roi Run file Main.java
+  echo Neu loi, mo project bang IntelliJ IDEA roi Run file MailApp.java
   pause
 )

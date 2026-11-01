@@ -4,7 +4,7 @@
 
 [Yêu cầu](REQUIREMENTS.md) · [Kiến trúc](ARCHITECTURE.md) · [Feature Map](FEATURE_MAP.md) · [Giao thức](PROTOCOL.md) · [Demo](DEMO.md) · [Kiểm thử](TESTING.md) · [Xử lý lỗi](TROUBLESHOOTING.md)
 
-Ứng dụng tự cài đặt giao thức FTP trên TCP Socket, gồm FTP Server có MySQL và FTP Client Swing hai cột tương tự FileZilla. Không dùng Apache FtpServer hoặc thư viện FTP cấp cao.
+Ứng dụng tự cài đặt giao thức FTP trên TCP Socket, gồm FTP Server có MySQL và FTP Client JavaFX hai cột lấy cảm hứng từ FileZilla. Không dùng Apache FtpServer hoặc thư viện FTP cấp cao.
 
 ## Chức năng
 
@@ -86,7 +86,7 @@ Khởi động server trước, sau đó:
 
 ```powershell
 .\compile.ps1
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab2.test.FtpIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab2.test.FtpIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test đăng nhập, upload, `LIST`, download, so sánh byte và xóa file. Kết quả cuối:

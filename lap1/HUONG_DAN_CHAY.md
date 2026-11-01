@@ -29,7 +29,7 @@ Cả hai máy phải ở cùng mạng LAN và Windows Network Profile nên đặ
 MySQL phải đang chạy và `db.properties` phải đúng:
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test mở sáu client, kiểm tra đăng nhập, chat riêng, multicast/broadcast và truyền file UDP.
@@ -37,7 +37,7 @@ Test mở sáu client, kiểm tra đăng nhập, chat riêng, multicast/broadcas
 ## Bot demo
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.LiveDemoBot" `
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.LiveDemoBot" "-Dexec.classpathScope=test" `
   "-Dexec.args=192.168.1.10 5000 An"
 ```
 

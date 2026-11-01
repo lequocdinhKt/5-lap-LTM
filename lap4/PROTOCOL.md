@@ -37,4 +37,4 @@ name=An&message=Xin+chao
 
 ## MIME
 
-`MimeTypes` ánh xạ ít nhất HTML/CSS/text, PDF, MP3 và MP4. File không biết loại dùng binary mặc định. Nguồn sự thật là `src/lab4/server/MimeTypes.java`.
+`MimeTypes` ánh xạ ít nhất HTML/CSS/text, PDF, MP3 và MP4. File không biết loại dùng binary mặc định. Nguồn sự thật là `src/main/java/lab4/server/MimeTypes.java`.

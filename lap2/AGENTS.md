@@ -5,4 +5,4 @@
 - Một data connection chỉ phục vụ một lệnh `LIST`, `RETR` hoặc `STOR`, sau đó phải đóng.
 - Mọi lệnh mới phải có reply code hợp lệ, cập nhật `PROTOCOL.md` và test tích hợp.
 - Mọi đường dẫn phải được chuẩn hóa và không được thoát khỏi home của người dùng.
-- Khi chuyển Swing sang JavaFX, giữ nguyên hành vi FTP trước rồi mới cải thiện bố cục/animation.
+- UI hiện dùng JavaFX; mọi cải tiến phải giữ `FtpClientSession` độc lập UI và không đổi hành vi FTP ngoài chủ đích.

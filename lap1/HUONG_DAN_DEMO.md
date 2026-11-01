@@ -231,7 +231,7 @@ Nếu muốn minh họa nhanh không cần thao tác tay:
 2. Chạy bot:
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.LiveDemoBot" `
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.LiveDemoBot" "-Dexec.classpathScope=test" `
   "-Dexec.args=localhost 5000 An"
 ```
 
@@ -249,7 +249,7 @@ Nếu muốn minh họa nhanh không cần thao tác tay:
 Chạy toàn bộ test tự động để chứng minh độ đúng đắn:
 
 ```powershell
-.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
+.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
 Test sẽ in từng dòng `[PASS]` và kết thúc bằng:

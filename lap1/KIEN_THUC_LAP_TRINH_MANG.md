@@ -19,14 +19,14 @@ TCP là giao thức **hướng kết nối** (connection-oriented), hoạt độ
 
 | Khái niệm | File | Dòng / Ghi chú |
 |-----------|------|----------------|
-| Mở cổng TCP server | [`ChatServer.java`](src/lab1/server/ChatServer.java:73) | `new ServerSocket(tcpPort)` |
-| Chấp nhận kết nối | [`ChatServer.java`](src/lab1/server/ChatServer.java:87) | `serverSocket.accept()` trong vòng lặp |
-| Tắt Nagle (giảm trễ) | [`ChatServer.java`](src/lab1/server/ChatServer.java:88) | `socket.setTcpNoDelay(true)` |
-| Thread pool cho client | [`ChatServer.java`](src/lab1/server/ChatServer.java:38) | `Executors.newFixedThreadPool(Protocol.MAX_CLIENTS)` |
-| Xử lý từng client | [`ClientHandler.java`](src/lab1/server/ClientHandler.java) | Đọc/ghi `DataInputStream`/`DataOutputStream` |
-| Kết nối client | [`ClientConnection.java`](src/lab1/client/ClientConnection.java) | `Socket` + luồng đọc riêng |
-| Khung lệnh dạng chuỗi | [`Protocol.java`](src/lab1/common/Protocol.java:26) | `LOGIN`, `REGISTER`, `TEXT`, `CREATE_GROUP`... |
-| Ghi/đọc danh sách chuỗi | [`Protocol.java`](src/lab1/common/Protocol.java:63) | `writeStringList` / `readStringList` |
+| Mở cổng TCP server | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java:73) | `new ServerSocket(tcpPort)` |
+| Chấp nhận kết nối | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java:87) | `serverSocket.accept()` trong vòng lặp |
+| Tắt Nagle (giảm trễ) | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java:88) | `socket.setTcpNoDelay(true)` |
+| Thread pool cho client | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java:38) | `Executors.newFixedThreadPool(Protocol.MAX_CLIENTS)` |
+| Xử lý từng client | [`ClientHandler.java`](src/main/java/lab1/server/ClientHandler.java) | Đọc/ghi `DataInputStream`/`DataOutputStream` |
+| Kết nối client | [`ClientConnection.java`](src/main/java/lab1/client/ClientConnection.java) | `Socket` + luồng đọc riêng |
+| Khung lệnh dạng chuỗi | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:26) | `LOGIN`, `REGISTER`, `TEXT`, `CREATE_GROUP`... |
+| Ghi/đọc danh sách chuỗi | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:63) | `writeStringList` / `readStringList` |
 
 **Luồng TCP điển hình:**
 
@@ -46,9 +46,9 @@ Mỗi dòng là một khung `DataOutputStream.writeUTF(...)` phân tách bằng 
 
 - Tin nhắn riêng **không được phép mất** hoặc sai thứ tự.
 - Kết nối TCP đã thiết lập sẵn cho mỗi client, gửi rất nhanh.
-- Server tra cứu người nhận trong [`ClientRegistry`](src/lab1/server/ClientRegistry.java) rồi ghi trực tiếp xuống socket của họ.
+- Server tra cứu người nhận trong [`ClientRegistry`](src/main/java/lab1/server/ClientRegistry.java) rồi ghi trực tiếp xuống socket của họ.
 
-Xem hàm [`ChatServer.sendDirectText()`](src/lab1/server/ChatServer.java:151).
+Xem hàm [`ChatServer.sendDirectText()`](src/main/java/lab1/server/ChatServer.java:151).
 
 ---
 
@@ -70,10 +70,10 @@ Lab 1 dùng UDP cho **ba mục đích khác nhau**, mỗi mục đích một c�
 
 | Cổng mặc định | Mục đích | File chính |
 |---------------|----------|------------|
-| `5002/udp` | Tin nhắn text nhóm (multicast) và "Tất cả" (broadcast) | [`UdpTextBroadcaster.java`](src/lab1/server/UdpTextBroadcaster.java), [`ClientUdpText.java`](src/lab1/client/ClientUdpText.java) |
-| `5001/udp` | Truyền file/audio/video (unicast có ACK/retry) | [`UdpFileRelay.java`](src/lab1/server/UdpFileRelay.java), [`ClientUdpFiles.java`](src/lab1/client/ClientUdpFiles.java) |
+| `5002/udp` | Tin nhắn text nhóm (multicast) và "Tất cả" (broadcast) | [`UdpTextBroadcaster.java`](src/main/java/lab1/server/UdpTextBroadcaster.java), [`ClientUdpText.java`](src/main/java/lab1/client/ClientUdpText.java) |
+| `5001/udp` | Truyền file/audio/video (unicast có ACK/retry) | [`UdpFileRelay.java`](src/main/java/lab1/server/UdpFileRelay.java), [`ClientUdpFiles.java`](src/main/java/lab1/client/ClientUdpFiles.java) |
 
-Hằng số giao thức tại [`Protocol.java`](src/lab1/common/Protocol.java:14):
+Hằng số giao thức tại [`Protocol.java`](src/main/java/lab1/common/Protocol.java:14):
 
 ```java
 DEFAULT_TCP_PORT      = 5000
@@ -92,7 +92,7 @@ MAX_UDP_TEXT_PACKET   = 8 KB
 - Tin nhắn chat chấp nhận mất gói (best effort) — đúng bản chất UDP.
 - Không cần thiết lập kết nối cho từng người nhận.
 
-Xem hàm [`ChatServer.sendGroupText()`](src/lab1/server/ChatServer.java:158).
+Xem hàm [`ChatServer.sendGroupText()`](src/main/java/lab1/server/ChatServer.java:158).
 
 ---
 
@@ -111,11 +111,11 @@ Multicast là gửi **một bản duy nhất** tới một **nhóm máy** đã �
 
 | Khái niệm | File | Dòng / Ghi chú |
 |-----------|------|----------------|
-| Cấp địa chỉ multicast cho nhóm | [`GroupRegistry.java`](src/lab1/server/GroupRegistry.java) | Mỗi nhóm một `239.10.x.x` |
-| Gửi multicast | [`UdpTextBroadcaster.multicast()`](src/lab1/server/UdpTextBroadcaster.java) | `MulticastSocket.send()` |
-| Client join nhóm | [`ClientUdpText.java`](src/lab1/client/ClientUdpText.java) | `MulticastSocket.joinGroup()` |
-| Mã gói tin multicast | [`Protocol.java`](src/lab1/common/Protocol.java:56) | `UDP_TEXT_MULTICAST = 1` |
-| Mã magic gói text | [`Protocol.java`](src/lab1/common/Protocol.java:54) | `UDP_TEXT_MAGIC = 0x4C315458` ("L1TX") |
+| Cấp địa chỉ multicast cho nhóm | [`GroupRegistry.java`](src/main/java/lab1/server/GroupRegistry.java) | Mỗi nhóm một `239.10.x.x` |
+| Gửi multicast | [`UdpTextBroadcaster.multicast()`](src/main/java/lab1/server/UdpTextBroadcaster.java) | `MulticastSocket.send()` |
+| Client join nhóm | [`ClientUdpText.java`](src/main/java/lab1/client/ClientUdpText.java) | `MulticastSocket.joinGroup()` |
+| Mã gói tin multicast | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:56) | `UDP_TEXT_MULTICAST = 1` |
+| Mã magic gói text | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:54) | `UDP_TEXT_MAGIC = 0x4C315458` ("L1TX") |
 
 **Luồng multicast:**
 
@@ -148,10 +148,10 @@ Broadcast gửi tới **mọi máy trong cùng mạng LAN** (subnet), dùng đ�
 
 | Khái niệm | File | Dòng / Ghi chú |
 |-----------|------|----------------|
-| Gửi broadcast | [`UdpTextBroadcaster.broadcast()`](src/lab1/server/UdpTextBroadcaster.java) | Gửi tới địa chỉ broadcast LAN |
-| Thêm loopback cho máy đơn | [`UdpTextBroadcaster.java`](src/lab1/server/UdpTextBroadcaster.java) | Gửi thêm `127.0.0.1` để demo 1 máy |
-| Mã gói tin broadcast | [`Protocol.java`](src/lab1/common/Protocol.java:57) | `UDP_TEXT_BROADCAST = 2` |
-| Nhóm hệ thống "Tất cả" | [`GroupRegistry.java`](src/lab1/server/GroupRegistry.java) | `systemGroup = true` |
+| Gửi broadcast | [`UdpTextBroadcaster.broadcast()`](src/main/java/lab1/server/UdpTextBroadcaster.java) | Gửi tới địa chỉ broadcast LAN |
+| Thêm loopback cho máy đơn | [`UdpTextBroadcaster.java`](src/main/java/lab1/server/UdpTextBroadcaster.java) | Gửi thêm `127.0.0.1` để demo 1 máy |
+| Mã gói tin broadcast | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:57) | `UDP_TEXT_BROADCAST = 2` |
+| Nhóm hệ thống "Tất cả" | [`GroupRegistry.java`](src/main/java/lab1/server/GroupRegistry.java) | `systemGroup = true` |
 
 **Luồng broadcast:**
 
@@ -188,17 +188,17 @@ UDP không đảm bảo, nên muốn truyền file đúng byte phải **tự xâ
 
 | Khái niệm | File | Dòng / Ghi chú |
 |-----------|------|----------------|
-| Chia chunk 4 KB | [`Protocol.java`](src/lab1/common/Protocol.java:22) | `UDP_CHUNK_SIZE = 4 * 1024` |
-| Timeout 500 ms | [`Protocol.java`](src/lab1/common/Protocol.java:23) | `UDP_ACK_TIMEOUT_MS = 500` |
-| Retry tối đa 8 lần | [`Protocol.java`](src/lab1/common/Protocol.java:24) | `UDP_MAX_RETRIES = 8` |
-| Magic chunk | [`Protocol.java`](src/lab1/common/Protocol.java:52) | `UDP_MAGIC_CHUNK = 0x1A01` |
-| Magic ACK | [`Protocol.java`](src/lab1/common/Protocol.java:53) | `UDP_MAGIC_ACK = 0x1A02` |
-| Mã hóa chunk | [`UdpFileRelay.encodeChunk()`](src/lab1/server/UdpFileRelay.java:166) | `ByteBuffer` gói tin nhị phân |
-| Mã hóa ACK | [`UdpFileRelay.encodeAck()`](src/lab1/server/UdpFileRelay.java:173) | 10 byte |
-| Nhận chunk + gửi ACK | [`UdpFileRelay.handlePacket()`](src/lab1/server/UdpFileRelay.java:67) | `putIfAbsent` chống trùng |
-| Gửi lại khi mất ACK | [`UdpFileRelay.deliverWithRetry()`](src/lab1/server/UdpFileRelay.java:114) | Vòng lặp retry |
-| Client nhận file | [`ClientUdpFiles.java`](src/lab1/client/ClientUdpFiles.java) | Ghi chunk vào file tạm |
-| Client gửi file | [`ClientUdpFiles.java`](src/lab1/client/ClientUdpFiles.java) | Đọc file, chia chunk, chờ ACK |
+| Chia chunk 4 KB | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:22) | `UDP_CHUNK_SIZE = 4 * 1024` |
+| Timeout 500 ms | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:23) | `UDP_ACK_TIMEOUT_MS = 500` |
+| Retry tối đa 8 lần | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:24) | `UDP_MAX_RETRIES = 8` |
+| Magic chunk | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:52) | `UDP_MAGIC_CHUNK = 0x1A01` |
+| Magic ACK | [`Protocol.java`](src/main/java/lab1/common/Protocol.java:53) | `UDP_MAGIC_ACK = 0x1A02` |
+| Mã hóa chunk | [`UdpFileRelay.encodeChunk()`](src/main/java/lab1/server/UdpFileRelay.java:166) | `ByteBuffer` gói tin nhị phân |
+| Mã hóa ACK | [`UdpFileRelay.encodeAck()`](src/main/java/lab1/server/UdpFileRelay.java:173) | 10 byte |
+| Nhận chunk + gửi ACK | [`UdpFileRelay.handlePacket()`](src/main/java/lab1/server/UdpFileRelay.java:67) | `putIfAbsent` chống trùng |
+| Gửi lại khi mất ACK | [`UdpFileRelay.deliverWithRetry()`](src/main/java/lab1/server/UdpFileRelay.java:114) | Vòng lặp retry |
+| Client nhận file | [`ClientUdpFiles.java`](src/main/java/lab1/client/ClientUdpFiles.java) | Ghi chunk vào file tạm |
+| Client gửi file | [`ClientUdpFiles.java`](src/main/java/lab1/client/ClientUdpFiles.java) | Đọc file, chia chunk, chờ ACK |
 
 **Cấu trúc gói CHUNK (nhị phân):**
 
@@ -246,7 +246,7 @@ Server làm **relay** vì client sau NAT không mở được cổng vào. Mỗi
 | Tốc độ / trễ | Chậm hơn | Nhanh hơn |
 | Dùng cho | Đăng nhập, chat riêng, điều khiển nhóm | Chat nhóm, broadcast, file |
 | Cổng Lab 1 | `5000` | `5001` (file), `5002` (text) |
-| File chính | [`ChatServer.java`](src/lab1/server/ChatServer.java), [`ClientHandler.java`](src/lab1/server/ClientHandler.java) | [`UdpFileRelay.java`](src/lab1/server/UdpFileRelay.java), [`UdpTextBroadcaster.java`](src/lab1/server/UdpTextBroadcaster.java) |
+| File chính | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java), [`ClientHandler.java`](src/main/java/lab1/server/ClientHandler.java) | [`UdpFileRelay.java`](src/main/java/lab1/server/UdpFileRelay.java), [`UdpTextBroadcaster.java`](src/main/java/lab1/server/UdpTextBroadcaster.java) |
 
 ---
 
@@ -254,22 +254,22 @@ Server làm **relay** vì client sau NAT không mở được cổng vào. Mỗi
 
 | Khái niệm | File chứa |
 |-----------|-----------|
-| Hằng số cổng, magic, kích thước | [`Protocol.java`](src/lab1/common/Protocol.java) |
-| Mã hóa/giải mã gói UDP text | [`Protocol.encodeUdpText()`](src/lab1/common/Protocol.java:82), [`Protocol.decodeUdpText()`](src/lab1/common/Protocol.java:101) |
-| Server TCP + điều phối | [`ChatServer.java`](src/lab1/server/ChatServer.java) |
-| Xử lý một client TCP | [`ClientHandler.java`](src/lab1/server/ClientHandler.java) |
-| Danh sách client online | [`ClientRegistry.java`](src/lab1/server/ClientRegistry.java) |
-| Quản lý nhóm + địa chỉ multicast | [`GroupRegistry.java`](src/lab1/server/GroupRegistry.java) |
-| Gửi UDP multicast/broadcast | [`UdpTextBroadcaster.java`](src/lab1/server/UdpTextBroadcaster.java) |
-| Relay file UDP + ACK/retry | [`UdpFileRelay.java`](src/lab1/server/UdpFileRelay.java) |
-| Client API mạng | [`ClientConnection.java`](src/lab1/client/ClientConnection.java) |
-| Client nhận UDP text | [`ClientUdpText.java`](src/lab1/client/ClientUdpText.java) |
-| Client gửi/nhận file UDP | [`ClientUdpFiles.java`](src/lab1/client/ClientUdpFiles.java) |
-| Giao diện server | [`ServerFxApp.java`](src/lab1/server/ServerFxApp.java) |
-| Giao diện client | [`ChatFxApp.java`](src/lab1/client/ChatFxApp.java) |
-| Lưu tài khoản MySQL | [`MySqlDB.java`](src/lab1/db/MySqlDB.java) |
-| Kiểm thử tích hợp | [`ChatIntegrationTest.java`](src/lab1/test/ChatIntegrationTest.java) |
-| Bot demo tự động | [`LiveDemoBot.java`](src/lab1/test/LiveDemoBot.java) |
+| Hằng số cổng, magic, kích thước | [`Protocol.java`](src/main/java/lab1/common/Protocol.java) |
+| Mã hóa/giải mã gói UDP text | [`Protocol.encodeUdpText()`](src/main/java/lab1/common/Protocol.java:82), [`Protocol.decodeUdpText()`](src/main/java/lab1/common/Protocol.java:101) |
+| Server TCP + điều phối | [`ChatServer.java`](src/main/java/lab1/server/ChatServer.java) |
+| Xử lý một client TCP | [`ClientHandler.java`](src/main/java/lab1/server/ClientHandler.java) |
+| Danh sách client online | [`ClientRegistry.java`](src/main/java/lab1/server/ClientRegistry.java) |
+| Quản lý nhóm + địa chỉ multicast | [`GroupRegistry.java`](src/main/java/lab1/server/GroupRegistry.java) |
+| Gửi UDP multicast/broadcast | [`UdpTextBroadcaster.java`](src/main/java/lab1/server/UdpTextBroadcaster.java) |
+| Relay file UDP + ACK/retry | [`UdpFileRelay.java`](src/main/java/lab1/server/UdpFileRelay.java) |
+| Client API mạng | [`ClientConnection.java`](src/main/java/lab1/client/ClientConnection.java) |
+| Client nhận UDP text | [`ClientUdpText.java`](src/main/java/lab1/client/ClientUdpText.java) |
+| Client gửi/nhận file UDP | [`ClientUdpFiles.java`](src/main/java/lab1/client/ClientUdpFiles.java) |
+| Giao diện server | [`ServerFxApp.java`](src/main/java/lab1/server/ServerFxApp.java) |
+| Giao diện client | [`ChatFxApp.java`](src/main/java/lab1/client/ChatFxApp.java) |
+| Lưu tài khoản MySQL | [`MySqlDB.java`](src/main/java/lab1/db/MySqlDB.java) |
+| Kiểm thử tích hợp | [`ChatIntegrationTest.java`](src/test/java/lab1/test/ChatIntegrationTest.java) |
+| Bot demo tự động | [`LiveDemoBot.java`](src/test/java/lab1/test/LiveDemoBot.java) |
 
 ---
 

@@ -22,7 +22,7 @@ Endpoint phải là `/submit`, `Content-Type` phải bắt đầu bằng `applic
 
 ## Browser/UI treo
 
-Swing hiện tại dùng `SwingWorker`; JavaFX mục tiêu dùng `Task`/executor. Không thực hiện socket read/download trên UI thread.
+`MiniBrowserApp` dùng `Task`/executor. Không thực hiện socket read/download trên JavaFX Application Thread.
 
 ## Server dùng nhiều RAM với media
 
