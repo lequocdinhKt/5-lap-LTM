@@ -17,7 +17,8 @@ alwaysApply: true
 
 ## Hiện trạng
 
-- Có: `lap1`, `lap3`, `lap4`.
-- Thiếu: `lap2`, `lap5`.
+- Có: `lap1`, `lap2`, `lap3`, `lap4`.
+- Thiếu: `lap5`.
+- Lab 1-4 dùng Maven Wrapper độc lập; hạ tầng MySQL và script kiểm tra nằm ở root.
 
 Không gộp hai lab vào một process/port/database. Mỗi lab tự chạy, tự README, tự script.

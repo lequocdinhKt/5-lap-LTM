@@ -4,16 +4,14 @@ Dự án Java thuần minh họa HTTP/1.1 chạy trên TCP Socket. Server và cl
 
 ## Yêu cầu
 
-- JDK 17 trở lên.
+- Temurin JDK 21 x64; Maven biên dịch mã ở mức Java 17.
 - Chạy các lệnh bên dưới trực tiếp từ thư mục chính `lap4`.
 - Chép `document.pdf`, `music.mp3`, `video.mp4` vào `www/files` nếu muốn demo tải media.
 
-## Biên dịch trên PowerShell
+## Build trên PowerShell
 
 ```powershell
-New-Item -ItemType Directory -Force out | Out-Null
-$sources = Get-ChildItem -Path src -Recurse -Filter *.java
-javac --release 17 -encoding UTF-8 -d out $sources.FullName
+.\build.ps1
 ```
 
 ## Chạy
@@ -21,25 +19,26 @@ javac --release 17 -encoding UTF-8 -d out $sources.FullName
 Mở terminal thứ nhất để chạy server:
 
 ```powershell
-java -cp out lab4.server.MiniWebServer
+.\run-server.ps1
 ```
 
 Server mặc định dùng cổng `8080` và thư mục `www`. Có thể truyền tùy chọn:
 
 ```powershell
-java -cp out lab4.server.MiniWebServer 8081 www
+.\run-server.ps1 -Port 8081
 ```
 
 Mở terminal thứ hai để thử Raw HTTP Client dạng console:
 
 ```powershell
-java -cp out lab4.client.RawHttpClient http://localhost:8080/
+.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab4.client.RawHttpClient" `
+  "-Dexec.args=http://localhost:8080/"
 ```
 
 Chạy giao diện Mini Browser:
 
 ```powershell
-java -cp out lab4.client.MiniBrowser
+.\run-client.ps1
 ```
 
 ## Kiểm thử nhanh server

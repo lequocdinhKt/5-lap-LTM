@@ -11,11 +11,15 @@ Workspace `5lap` gồm 5 bài độc lập: `lap1/` Chat, `lap2/` FTP, `lap3/` M
 
 - User nói lab N, "sửa chat", "FTP", "mail", "web", "RMI" → **chỉ đọc và sửa** thư mục `lapN/` tương ứng.
 - Không mở, không copy, không refactor, không đồng bộ code/config/port/database sang lab khác.
-- Không tạo file dùng chung ở root cho nhiều lab.
+- Không gộp mã nghiệp vụ giữa các lab. Root chỉ chứa hạ tầng chung đã chuẩn hóa
+  (`compose.yaml`, script setup/verify/firewall và tài liệu môi trường).
 
 ## Ngoại lệ
 
 Chỉ đụng nhiều lab khi user **nói rõ**: "toàn bộ lab", "cả 5 lab", "tất cả lab", hoặc liệt kê nhiều lab trong cùng yêu cầu.
+
+Các thay đổi môi trường chung ở root phải giữ mỗi lab là một Maven project độc lập,
+không dùng chung process, port hay database.
 
 ## Ví dụ
 

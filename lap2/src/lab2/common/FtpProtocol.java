@@ -4,6 +4,8 @@ import java.net.InetAddress;
 
 public final class FtpProtocol {
     public static final int DEFAULT_PORT = 2121;
+    public static final int PASSIVE_PORT_MIN = 30_000;
+    public static final int PASSIVE_PORT_MAX = 30_020;
     public static final String CRLF = "\r\n";
 
     private FtpProtocol() {

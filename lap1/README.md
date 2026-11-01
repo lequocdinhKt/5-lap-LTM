@@ -51,9 +51,9 @@ Chi tiết từng file xem tại [`KIEN_THUC_LAP_TRINH_MANG.md`](KIEN_THUC_LAP_T
 
 ## Yêu cầu
 
-- JDK 17 trở lên (có JavaFX).
-- MySQL Server chạy tại `localhost:3306`.
-- Driver [`lib/mysql-connector-j-9.5.0.jar`](lib/mysql-connector-j-9.5.0.jar) (đã kèm sẵn).
+- Temurin JDK 21 x64; Maven biên dịch mã ở mức Java 17.
+- MySQL từ môi trường Docker chung ở root hoặc MySQL 8.4 cài trực tiếp.
+- Maven Wrapper tự tải JavaFX và MySQL Connector/J.
 
 ## Cấu hình MySQL
 
@@ -62,8 +62,8 @@ Sửa [`db.properties`](db.properties):
 ```properties
 db.url=jdbc:mysql://localhost:3306
 db.name=lab1_chat
-db.user=lap1
-db.password=lap1pass
+db.user=root
+db.password=YOUR_MYSQL_PASSWORD
 ```
 
 Server tự tạo database `lab1_chat` và bảng `users` khi khởi động.
@@ -72,15 +72,10 @@ Server tự tạo database `lab1_chat` và bảng `users` khi khởi động.
 
 Xem hướng dẫn đầy đủ tại [`HUONG_DAN_CHAY.md`](HUONG_DAN_CHAY.md).
 
-```bash
-# Biên dịch
-javac --release 17 -encoding UTF-8 -cp "lib/mysql-connector-j-9.5.0.jar" -d out $(find src -name "*.java")
-
-# Chạy server (có giao diện)
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.server.ChatServer
-
-# Chạy client (mở nhiều cửa sổ)
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.client.ChatClient
+```powershell
+.\build.ps1
+.\run-server.ps1
+.\run-client.ps1
 ```
 
 ## Demo
@@ -89,8 +84,8 @@ Xem kịch bản trình bày tại [`HUONG_DAN_DEMO.md`](HUONG_DAN_DEMO.md).
 
 ## Kiểm thử tích hợp
 
-```bash
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.test.ChatIntegrationTest
+```powershell
+.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
 ```
 
 Kết quả cuối:

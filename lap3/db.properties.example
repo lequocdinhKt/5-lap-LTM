@@ -1,0 +1,3 @@
+url=jdbc:mysql://localhost:3306/lab3_mail?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh
+user=root
+password=YOUR_MYSQL_PASSWORD

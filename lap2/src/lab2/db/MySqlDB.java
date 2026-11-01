@@ -21,7 +21,7 @@ public final class MySqlDB {
             return;
         }
         String baseUrl = required("db.url");
-        String database = config.getProperty("db.name", "lab2_ftp");
+        String database = value("db.name", "lab2_ftp");
         try (Connection connection = DriverManager.getConnection(baseUrl, required("db.user"), required("db.password"));
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + database.replace("`", "") +
@@ -89,17 +89,32 @@ public final class MySqlDB {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(required("db.url") + "/" + config.getProperty("db.name", "lab2_ftp")
+        return DriverManager.getConnection(required("db.url") + "/" + value("db.name", "lab2_ftp")
                 + "?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC",
                 required("db.user"), required("db.password"));
     }
 
     private String required(String key) {
-        String value = config.getProperty(key, "").trim();
-        if (value.isEmpty()) {
+        String configured = value(key, "");
+        if (configured.isEmpty()) {
             throw new IllegalStateException("Thiếu cấu hình " + key + " trong db.properties");
         }
-        return value;
+        return configured;
+    }
+
+    private String value(String key, String defaultValue) {
+        String environmentName = switch (key) {
+            case "db.url" -> "LTM_DB_URL";
+            case "db.name" -> "LTM_DB_NAME";
+            case "db.user" -> "LTM_DB_USER";
+            case "db.password" -> "LTM_DB_PASSWORD";
+            default -> "";
+        };
+        String environmentValue = environmentName.isEmpty() ? null : System.getenv(environmentName);
+        if (environmentValue != null && !environmentValue.isBlank()) {
+            return environmentValue.trim();
+        }
+        return config.getProperty(key, defaultValue).trim();
     }
 
     private static Properties loadConfig() {
@@ -108,7 +123,20 @@ public final class MySqlDB {
             properties.load(reader);
             return properties;
         } catch (IOException error) {
+            if (hasEnvironmentConfig()) {
+                return properties;
+            }
             throw new IllegalStateException("Không đọc được db.properties", error);
         }
+    }
+
+    private static boolean hasEnvironmentConfig() {
+        return !blank(System.getenv("LTM_DB_URL"))
+                && !blank(System.getenv("LTM_DB_USER"))
+                && System.getenv("LTM_DB_PASSWORD") != null;
+    }
+
+    private static boolean blank(String value) {
+        return value == null || value.isBlank();
     }
 }

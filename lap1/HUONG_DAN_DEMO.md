@@ -4,20 +4,17 @@ Kịch bản trình bày từng bước để chứng minh đủ các mô hình 
 
 ## 0. Chuẩn bị trước khi demo
 
-### 0.1. Khởi động MySQL
+### 0.1. Chuẩn bị môi trường và MySQL
 
-```bash
-sudo systemctl start mysql     # Linux
-# hoặc mở MySQL từ Services trên Windows/macOS
+```powershell
+# Chạy ở thư mục root 5lap trong lần cài đầu
+.\setup-windows.ps1
 ```
 
 ### 0.2. Biên dịch (nếu chưa làm)
 
-```bash
-mkdir -p out
-javac --release 17 -encoding UTF-8 \
-  -cp "lib/mysql-connector-j-9.5.0.jar" \
-  -d out $(find src -name "*.java")
+```powershell
+.\build.ps1
 ```
 
 ### 0.3. Mở sẵn các cửa sổ
@@ -33,8 +30,8 @@ Chuẩn bị **4 cửa sổ terminal**:
 
 ### 0.4. Khởi động server (T1)
 
-```bash
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.server.ChatServer
+```powershell
+.\run-server.ps1
 ```
 
 Trong cửa sổ server:
@@ -45,15 +42,9 @@ Trong cửa sổ server:
 
 ### 0.5. Khởi động 3 client (T2, T3, T4)
 
-```bash
-# T2
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.client.ChatClient localhost 5000 An matkhau123
-
-# T3
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.client.ChatClient localhost 5000 Binh matkhau123
-
-# T4
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.client.ChatClient localhost 5000 Chi matkhau123
+```powershell
+# Chạy ở ba terminal, rồi nhập An/Binh/Chi trong giao diện
+.\run-client.ps1
 ```
 
 > Lần đầu chạy, mỗi tài khoản sẽ được tự đăng ký vào MySQL. Lần sau dùng đúng mật khẩu đã đặt.
@@ -239,8 +230,9 @@ Nếu muốn minh họa nhanh không cần thao tác tay:
 1. Giữ client `An` đang online.
 2. Chạy bot:
 
-```bash
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.test.LiveDemoBot localhost 5000 An
+```powershell
+.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.LiveDemoBot" `
+  "-Dexec.args=localhost 5000 An"
 ```
 
 3. Bot tự:
@@ -256,8 +248,8 @@ java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.test.LiveDemoBot localhost 5
 
 Chạy toàn bộ test tự động để chứng minh độ đúng đắn:
 
-```bash
-java -cp "out:lib/mysql-connector-j-9.5.0.jar" lab1.test.ChatIntegrationTest
+```powershell
+.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab1.test.ChatIntegrationTest"
 ```
 
 Test sẽ in từng dòng `[PASS]` và kết thúc bằng:

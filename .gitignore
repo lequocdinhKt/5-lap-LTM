@@ -1,0 +1,22 @@
+# Build output is always recreated by Maven.
+**/target/
+**/out/
+**/*.class
+
+# Dependencies are resolved by Maven, not committed as binary jars.
+**/lib/
+
+# Local database/runtime configuration.
+**/db.properties
+.env
+
+# IDE and operating-system state.
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Runtime downloads and temporary files.
+**/*.downloading
+**/*.uploading
+**/downloads/

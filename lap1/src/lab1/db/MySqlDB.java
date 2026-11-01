@@ -23,7 +23,7 @@ public final class MySqlDB {
 
     public synchronized void ensureReady() throws SQLException {
         if (initialized) return;
-        String database = config.getProperty("db.name", "lab1_chat");
+        String database = value("db.name", "lab1_chat");
         try (Connection connection = DriverManager.getConnection(required("db.url"),
                 required("db.user"), required("db.password"));
              Statement statement = connection.createStatement()) {
@@ -71,15 +71,30 @@ public final class MySqlDB {
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(required("db.url") + "/"
-                        + config.getProperty("db.name", "lab1_chat")
+                        + value("db.name", "lab1_chat")
                         + "?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC",
                 required("db.user"), required("db.password"));
     }
 
     private String required(String key) {
-        String value = config.getProperty(key, "").trim();
-        if (value.isEmpty()) throw new IllegalStateException("Thieu cau hinh " + key);
-        return value;
+        String configured = value(key, "");
+        if (configured.isEmpty()) throw new IllegalStateException("Thieu cau hinh " + key);
+        return configured;
+    }
+
+    private String value(String key, String defaultValue) {
+        String environmentName = switch (key) {
+            case "db.url" -> "LTM_DB_URL";
+            case "db.name" -> "LTM_DB_NAME";
+            case "db.user" -> "LTM_DB_USER";
+            case "db.password" -> "LTM_DB_PASSWORD";
+            default -> "";
+        };
+        String environmentValue = environmentName.isEmpty() ? null : System.getenv(environmentName);
+        if (environmentValue != null && !environmentValue.isBlank()) {
+            return environmentValue.trim();
+        }
+        return config.getProperty(key, defaultValue).trim();
     }
 
     private static Properties loadConfig() {
@@ -88,8 +103,21 @@ public final class MySqlDB {
             properties.load(reader);
             return properties;
         } catch (IOException error) {
+            if (hasEnvironmentConfig()) {
+                return properties;
+            }
             throw new IllegalStateException("Khong doc duoc db.properties", error);
         }
+    }
+
+    private static boolean hasEnvironmentConfig() {
+        return !blank(System.getenv("LTM_DB_URL"))
+                && !blank(System.getenv("LTM_DB_USER"))
+                && System.getenv("LTM_DB_PASSWORD") != null;
+    }
+
+    private static boolean blank(String value) {
+        return value == null || value.isBlank();
     }
 
     private static String hash(String password) {

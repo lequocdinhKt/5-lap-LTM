@@ -32,9 +32,9 @@ FTP Client ── TCP data tạm thời ──> FTP Server (PASV)
 
 ## Yêu cầu
 
-- JDK 17 trở lên.
-- MySQL Server chạy tại `localhost:3306`.
-- PowerShell và kết nối Internet trong lần biên dịch đầu để tải MySQL Connector/J.
+- Temurin JDK 21 x64; Maven biên dịch mã ở mức Java 17.
+- MySQL từ môi trường Docker chung ở root hoặc MySQL 8.4 cài trực tiếp.
+- PowerShell và kết nối Internet trong lần build đầu để Maven tải dependency.
 
 ## Chuẩn bị MySQL
 
@@ -82,7 +82,7 @@ Khởi động server trước, sau đó:
 
 ```powershell
 .\compile.ps1
-java -cp out lab2.test.FtpIntegrationTest
+.\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab2.test.FtpIntegrationTest"
 ```
 
 Test đăng nhập, upload, `LIST`, download, so sánh byte và xóa file. Kết quả cuối:
@@ -104,6 +104,7 @@ Tạo site với:
 - Transfer mode: Passive
 
 Server hỗ trợ: `USER`, `PASS`, `QUIT`, `SYST`, `FEAT`, `OPTS`, `PWD`, `CWD`, `CDUP`, `TYPE`, `PASV`, `PORT`, `LIST`, `NLST`, `RETR`, `STOR`, `DELE`, `MKD`, `RMD`, `SIZE`, `NOOP`.
+PASV dùng dải cố định `30000-30020` để cấu hình Windows Firewall giống nhau trên hai máy.
 
 ## Kịch bản trình bày
 

@@ -1,5 +1,4 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
-& .\compile.ps1
-$jar = Get-ChildItem "lib\mysql-connector-j-*.jar" | Select-Object -First 1
-java -cp "out;$($jar.FullName)" lab2.server.FtpServer 2121 ftp-root
+& .\mvnw.cmd -q compile exec:java "-Dexec.mainClass=lab2.server.FtpServer" "-Dexec.args=2121 ftp-root"
+if ($LASTEXITCODE -ne 0) { throw "Lab 2 FTP Server dừng với lỗi." }
