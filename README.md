@@ -2,6 +2,7 @@
 
 ## Project harness
 
+- [Tiến độ hiện tại và lý do tạm dừng](PROGRESS.md)
 - [Bối cảnh dự án](PROJECT_CONTEXT.md)
 - [Kiến trúc chung](COMMON_ARCHITECTURE.md)
 - [Design system JavaFX](DESIGN_SYSTEM.md)

@@ -9,5 +9,7 @@
 - UI gọi `service`; `service` gọi `network`/`db`. Không đặt socket, SQL hoặc xử lý file dài trong JavaFX Application Thread.
 - Cấu hình host, port, tài khoản và đường dẫn phải nhận từ biến môi trường, tham số hoặc file cục bộ bị ignore; không hard-code secret.
 - Mỗi thay đổi chức năng phải cập nhật `FEATURE_MAP.md`, `PROTOCOL.md`, `TESTING.md` hoặc `DEMO.md` liên quan.
+- Trước khi làm task, cập nhật một mục trong `PROGRESS.md` thành `🟡 Đang làm`. Khi kết thúc, đổi thành hoàn thành, tạm dừng hoặc bị chặn; luôn ghi lý do dừng và bước tiếp theo.
+- Không đánh dấu hoàn thành chỉ vì code đã tồn tại; phải có bằng chứng build/test phù hợp. Mỗi lần cập nhật tiến độ thêm một dòng vào phần lịch sử.
 - Không tuyên bố hoàn thành nếu chưa đối chiếu `DEFINITION_OF_DONE.md` và chạy kiểm tra phù hợp.
 - Không xây mã nguồn Lab 5 cho tới khi người dùng yêu cầu; hiện chỉ duy trì tài liệu và quy tắc chuẩn bị tích hợp.
