@@ -1,5 +1,15 @@
 # 5 Lab Lập Trình Mạng - môi trường Windows thống nhất
 
+## Project harness
+
+- [Bối cảnh dự án](PROJECT_CONTEXT.md)
+- [Kiến trúc chung](COMMON_ARCHITECTURE.md)
+- [Design system JavaFX](DESIGN_SYSTEM.md)
+- [Sơ đồ demo nhiều máy](DEMO_TOPOLOGY.md)
+- [Quy tắc viết code](CODING_RULES.md)
+- [Definition of Done](DEFINITION_OF_DONE.md)
+- Rule cho Codex/AI nằm trong `AGENTS.md` ở root và từng thư mục lab; dự án không còn dùng `.cursor/rules`.
+
 Repository dùng một quy ước chung cho hai máy Windows:
 
 - Temurin JDK 21 x64 trên cả hai máy; mã nguồn biên dịch ở mức Java 17.

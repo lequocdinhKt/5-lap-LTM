@@ -1,5 +1,9 @@
 # Lab 1 - Chat Client/Server đa giao thức (TCP + UDP)
 
+## Bộ tài liệu
+
+[Yêu cầu](REQUIREMENTS.md) · [Kiến trúc](ARCHITECTURE.md) · [Feature Map](FEATURE_MAP.md) · [Giao thức](PROTOCOL.md) · [Demo](DEMO.md) · [Kiểm thử](TESTING.md) · [Xử lý lỗi](TROUBLESHOOTING.md)
+
 Ứng dụng chat JavaFX tự cài đặt trên socket thô, minh họa rõ ba mô hình truyền thông của lập trình mạng:
 
 - **TCP** cho điều khiển phiên, đăng nhập/đăng ký và chat riêng (đảm bảo, có thứ tự).
