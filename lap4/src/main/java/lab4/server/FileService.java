@@ -39,20 +39,12 @@ public final class FileService {
             if (!realFile.startsWith(webRoot)) {
                 throw new HttpRequest.BadRequestException("Từ chối symbolic link ra ngoài www");
             }
-            return new Resource(Files.readAllBytes(realFile), MimeTypes.forPath(realFile));
+            return new Resource(realFile, Files.size(realFile), MimeTypes.forPath(realFile));
         } catch (InvalidPathException exception) {
             throw new HttpRequest.BadRequestException("Đường dẫn tài nguyên không hợp lệ");
         }
     }
 
-    public record Resource(byte[] bytes, String contentType) {
-        public Resource {
-            bytes = bytes.clone();
-        }
-
-        @Override
-        public byte[] bytes() {
-            return bytes.clone();
-        }
-    }
+    /** Chỉ giữ metadata và đường dẫn đã kiểm tra; nội dung được stream khi ghi response. */
+    public record Resource(Path path, long size, String contentType) { }
 }

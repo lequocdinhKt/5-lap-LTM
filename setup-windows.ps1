@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [switch]$SkipDocker,
     [switch]$PreserveConfig
@@ -39,7 +39,8 @@ if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
     throw "Chưa có Java. Hãy cài Temurin JDK 21 x64 rồi chạy lại."
 }
 
-$javaVersion = (& java -version 2>&1 | Select-Object -First 1) -join ""
+# "java -version" ghi thông tin ra stderr; chạy qua cmd để không bị coi là lỗi terminating khi $ErrorActionPreference = "Stop".
+$javaVersion = (& cmd /c "java -version 2>&1" | Select-Object -First 1) -join ""
 if ($javaVersion -notmatch 'version "21\.') {
     Write-Warning "Khuyến nghị Temurin JDK 21 x64 trên cả hai máy. Hiện tại: $javaVersion"
 }
@@ -92,7 +93,8 @@ if (-not $SkipDocker) {
     if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         throw "Chưa có Docker Desktop. Cài Docker Desktop hoặc chạy với -SkipDocker nếu dùng MySQL cài trực tiếp."
     }
-    & docker compose up -d
+    # docker ghi tiến trình ra stderr; chạy qua cmd để không sinh NativeCommandError khi $ErrorActionPreference = "Stop".
+    & cmd /c "docker compose up -d 2>&1"
     if ($LASTEXITCODE -ne 0) {
         throw "Không khởi động được MySQL. Kiểm tra Docker Desktop và cổng $port."
     }

@@ -84,7 +84,7 @@ public final class ClientHandler implements Runnable {
         try {
             FileService.Resource resource = fileService.load(request.getPath());
             return new HandledResponse(
-                    new HttpResponse(200, resource.contentType(), resource.bytes()),
+                    HttpResponse.file(200, resource.contentType(), resource.path(), resource.size()),
                     includeBody);
         } catch (NoSuchFileException | FileNotFoundException exception) {
             return new HandledResponse(

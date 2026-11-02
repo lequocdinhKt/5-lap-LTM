@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 & .\mvnw.cmd -q clean package
 if ($LASTEXITCODE -ne 0) { throw "Build Lab 4 thất bại." }

@@ -33,7 +33,13 @@ Get-FileHash .\downloaded.pdf
 .\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab4.test.HttpIntegrationTest" "-Dexec.classpathScope=test"
 ```
 
-Test dùng web root/port tạm và kiểm tra GET, HEAD, POST, 404, 405, path traversal rồi tự đóng server. Test độc lập UI.
+Test dùng web root/port tạm và kiểm tra GET file stream đúng từng byte, HEAD, POST, 404, 405, path traversal rồi tự đóng server. Test độc lập UI.
+
+## Bằng chứng đã chạy
+
+- **02/11/2026:** `.\mvnw.cmd -B -q clean verify` tại `lap4` → thành công.
+- **02/11/2026:** `.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab4.test.HttpIntegrationTest" "-Dexec.classpathScope=test"` → in `PASS` cho từng nhóm kiểm tra và tự đóng server.
+- File tĩnh/media được stream trực tiếp từ đĩa (`HttpResponse.file()` + `InputStream.transferTo()`), console chỉ in metadata nên không giữ file lớn trong RAM.
 
 ## Test hai máy
 

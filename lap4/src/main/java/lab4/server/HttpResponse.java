@@ -3,6 +3,8 @@ package lab4.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,15 +14,26 @@ public final class HttpResponse {
     private final String reasonPhrase;
     private final Map<String, String> headers = new LinkedHashMap<>();
     private final byte[] body;
+    private final Path bodyFile;
 
     public HttpResponse(int statusCode, String contentType, byte[] body) {
+        this(statusCode, contentType, body, null, body == null ? 0 : body.length);
+    }
+
+    private HttpResponse(int statusCode, String contentType, byte[] body,
+                         Path bodyFile, long contentLength) {
         this.statusCode = statusCode;
         this.reasonPhrase = reasonFor(statusCode);
         this.body = body == null ? new byte[0] : body.clone();
+        this.bodyFile = bodyFile;
         headers.put("Content-Type", contentType);
-        headers.put("Content-Length", Integer.toString(this.body.length));
+        headers.put("Content-Length", Long.toString(contentLength));
         headers.put("Connection", "close");
         headers.put("Server", "Lab4MiniWeb/1.0");
+    }
+
+    public static HttpResponse file(int statusCode, String contentType, Path file, long size) {
+        return new HttpResponse(statusCode, contentType, null, file, size);
     }
 
     public static HttpResponse html(int statusCode, String title, String message) {
@@ -54,7 +67,13 @@ public final class HttpResponse {
         head.append("\r\n");
         output.write(head.toString().getBytes(StandardCharsets.ISO_8859_1));
         if (includeBody) {
-            output.write(body);
+            if (bodyFile != null) {
+                try (var input = Files.newInputStream(bodyFile)) {
+                    input.transferTo(output);
+                }
+            } else {
+                output.write(body);
+            }
         }
         output.flush();
     }

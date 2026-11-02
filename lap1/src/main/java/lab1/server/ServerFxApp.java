@@ -37,6 +37,10 @@ public final class ServerFxApp extends Application {
         log.setEditable(false);
         log.setWrapText(true);
         stop.setDisable(true);
+        start.getStyleClass().add("primary-button");
+        stop.getStyleClass().add("danger-button");
+        status.getStyleClass().addAll("status-badge", "status-neutral");
+        clientCount.getStyleClass().add("metric-badge");
         GridPane form = new GridPane();
         form.setHgap(10);
         form.setVgap(8);
@@ -60,16 +64,34 @@ public final class ServerFxApp extends Application {
 
         start.setOnAction(event -> startServer());
         stop.setOnAction(event -> stopServer());
-        VBox top = new VBox(12, new Label("LAB 1 - CHAT CLIENT SERVER"), form,
-                new HBox(10, start, stop, clientCount));
-        top.setPadding(new Insets(15));
-        VBox center = new VBox(8, new Label("Client đang online"), table,
-                new Label("Nhật ký TCP / UDP"), log);
-        center.setPadding(new Insets(0, 15, 15, 15));
+        Label eyebrow = new Label("LAB 1 · SERVER CONTROL");
+        eyebrow.getStyleClass().add("eyebrow");
+        Label title = new Label("Chat Server");
+        title.getStyleClass().add("page-title");
+        HBox actions = new HBox(10, start, stop, clientCount);
+        actions.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        VBox serverCard = new VBox(14, eyebrow, title, form, actions);
+        serverCard.getStyleClass().add("server-card");
+        VBox top = new VBox(serverCard);
+        top.setPadding(new Insets(20, 20, 12, 20));
+        Label onlineTitle = new Label("Client đang online");
+        Label logTitle = new Label("Nhật ký TCP / UDP");
+        onlineTitle.getStyleClass().add("card-title");
+        logTitle.getStyleClass().add("card-title");
+        VBox center = new VBox(10, onlineTitle, table, logTitle, log);
+        center.getStyleClass().add("content-card");
+        center.setPadding(new Insets(16));
+        BorderPane.setMargin(center, new Insets(0, 20, 20, 20));
         VBox.setVgrow(table, Priority.SOMETIMES);
         VBox.setVgrow(log, Priority.ALWAYS);
         BorderPane root = new BorderPane(center, top, null, null, null);
-        stage.setScene(new Scene(root, 820, 680));
+        root.getStyleClass().add("app-background");
+        Scene scene = new Scene(root, 860, 720);
+        var css = ServerFxApp.class.getResource("/css/lab1.css");
+        if (css != null) scene.getStylesheets().add(css.toExternalForm());
+        stage.setMinWidth(720);
+        stage.setMinHeight(580);
+        stage.setScene(scene);
         stage.setTitle("Lab 1 - Chat Server");
         stage.setOnCloseRequest(event -> stopServer());
         stage.show();
@@ -109,6 +131,7 @@ public final class ServerFxApp extends Application {
         udpText.setDisable(running);
         udpFile.setDisable(running);
         status.setText(running ? "Đang chạy" : "Đã dừng");
+        status.getStyleClass().setAll("status-badge", running ? "status-success" : "status-neutral");
         if (!running) {
             clients.clear();
             clientCount.setText("Client online: 0");

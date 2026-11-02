@@ -7,7 +7,7 @@
 | HEAD | `MiniBrowserApp.sendHead()` | `RawHttpClient.head()` | `serveFile(request, false)` → `HttpResponse.writeTo(..., false)` |
 | POST form | `MiniBrowserApp.sendPost()` | `RawHttpClient.postForm()` | `ClientHandler.handlePost()` |
 | Parse request | — | — | `HttpRequest.parse()` |
-| File tĩnh/media | render/download | parse body/header | `FileService.load()` → `MimeTypes` |
+| File tĩnh/media | render/download | parse body/header | `FileService.load()` → `HttpResponse.file()` → `InputStream.transferTo()` |
 | Status/header | `MiniBrowserApp.displayResponse()` | `RawHttpClient.readResponse()` | `HttpResponse` |
 | History | `MiniBrowserApp.addHistory()` | `BrowserHistory.add()` | — |
 | Download | `MiniBrowserApp.downloadCurrentUrl()` | `RawHttpClient.get()` | GET file tĩnh |

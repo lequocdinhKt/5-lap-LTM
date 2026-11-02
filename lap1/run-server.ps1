@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param([switch]$Console)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot

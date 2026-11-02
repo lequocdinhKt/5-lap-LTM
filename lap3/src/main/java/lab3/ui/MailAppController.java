@@ -1,7 +1,7 @@
 package lab3.ui;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
+import java.util.function.Consumer;
 import lab3.service.AppService;
 import lab3.ui.MailAppView.AuthForm;
 import lab3.ui.MailAppView.ReadForm;
@@ -22,21 +22,19 @@ public class MailAppController {
     }
 
     private void handleRegister(AuthForm form) {
-        try {
-            boolean ok = appService.register(form.username, form.password);
+        runBackground("Đang đăng ký...", null,
+                () -> appService.register(form.username, form.password), ok -> {
             if (ok) {
                 view.showInfo("Đăng ký thành công.");
             } else {
                 view.showError("Đăng ký thất bại.");
             }
-        } catch (Exception e) {
-            view.showError(e.getMessage());
-        }
+        });
     }
 
     private void handleLogin(AuthForm form) {
-        try {
-            boolean ok = appService.login(form.username, form.password);
+        runBackground("Đang đăng nhập...", null,
+                () -> appService.login(form.username, form.password), ok -> {
             if (ok) {
                 view.showSession(appService.getCurrentUser());
                 view.showInfo("Đăng nhập thành công.");
@@ -44,9 +42,7 @@ public class MailAppController {
                 view.showSession(null);
                 view.showError("Sai tên đăng nhập hoặc mật khẩu.");
             }
-        } catch (Exception e) {
-            view.showError(e.getMessage());
-        }
+        });
     }
 
     private void handleLogout() {
@@ -56,49 +52,54 @@ public class MailAppController {
     }
 
     private void handleSend(SendForm form) {
-        runBackground(() -> {
-            boolean saved = appService.sendMail(
+        runBackground("Đang gửi qua SMTP...", null, () -> appService.sendMail(
                     form.serverType,
                     form.sender,
                     form.password,
                     form.receiver,
                     form.subject,
                     form.content
-            );
-            Platform.runLater(() -> {
-                if (saved) {
-                    view.showInfo("Gửi và lưu mail thành công.");
-                } else {
-                    view.showError("Đã gửi mail nhưng không lưu được lịch sử.");
-                }
-            });
+            ), saved -> {
+            if (saved) {
+                view.showInfo("Gửi và lưu mail thành công.");
+            } else {
+                view.showError("Đã gửi mail nhưng không lưu được lịch sử.");
+            }
         });
     }
 
     private void handleRead(ReadForm form) {
-        runBackground(() -> {
-            var mails = appService.readMails(form.serverType, form.email, form.password);
-            Platform.runLater(() -> view.showInbox(mails));
-        });
+        runBackground("Đang tải POP3...", view::showInboxLoading,
+                () -> appService.readMails(form.serverType, form.email, form.password),
+                view::showInbox);
     }
 
-    private void runBackground(CheckedAction action) {
-        Task<Void> task = new Task<>() {
+    private <T> void runBackground(String message, Runnable before,
+                                   CheckedSupplier<T> action, Consumer<T> onSuccess) {
+        if (before != null) before.run();
+        view.setBusy(true, message);
+        Task<T> task = new Task<>() {
             @Override
-            protected Void call() throws Exception {
-                action.run();
-                return null;
+            protected T call() throws Exception {
+                return action.get();
             }
         };
+        task.setOnSucceeded(event -> {
+            view.setBusy(false, "Sẵn sàng");
+            onSuccess.accept(task.getValue());
+        });
         task.setOnFailed(e -> {
+            view.setBusy(false, "Thao tác thất bại");
             Throwable error = task.getException();
             view.showError(error == null ? "Có lỗi xảy ra." : error.getMessage());
         });
-        new Thread(task, "mail-task").start();
+        Thread worker = new Thread(task, "mail-task");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     @FunctionalInterface
-    private interface CheckedAction {
-        void run() throws Exception;
+    private interface CheckedSupplier<T> {
+        T get() throws Exception;
     }
 }

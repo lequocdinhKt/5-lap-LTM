@@ -6,6 +6,27 @@
 - Chạy firewall ở root; dùng cùng Wi-Fi/LAN.
 - Chuẩn bị ảnh, audio/video ngắn dưới 20 MB và 5 tài khoản demo.
 
+Mở nhanh 2–3 client trên mỗi máy (tên được điền sẵn, mật khẩu vẫn nhập tại UI):
+
+```powershell
+.\run-demo-clients.ps1 -ServerHost <IP_MAY_A> -ClientCount 3 -UsernamePrefix mayB
+```
+
+Máy chạy server có thể dùng `-ServerHost localhost -ClientCount 2 -UsernamePrefix mayA`.
+
+Muốn mở đủ 5–6 client mà không phải nhập mật khẩu, thêm `-AutoConnect`: client dùng tài khoản demo
+`<UsernamePrefix><STT>` với mật khẩu quy ước `lab1-<tên>` và tự đăng ký nếu tài khoản chưa tồn tại.
+
+```powershell
+# Máy A (server + MySQL): 3 client nội bộ
+.\run-demo-clients.ps1 -ServerHost localhost -ClientCount 3 -UsernamePrefix mayA -AutoConnect
+
+# Máy B: 3 client trỏ về IPv4 của máy A
+.\run-demo-clients.ps1 -ServerHost 192.168.1.10 -ClientCount 3 -UsernamePrefix mayB -AutoConnect
+```
+
+Dùng mật khẩu riêng thì truyền `-Password '<mật khẩu demo>'`; tài khoản mới tạo lần đầu thêm `-Register`.
+
 ## Kịch bản 7 phút
 
 1. Mở server, chỉ TCP/UDP ports và danh sách client trống.

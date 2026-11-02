@@ -18,8 +18,8 @@ flowchart LR
 - `MiniWebServer`: bind port, thread pool và lifecycle.
 - `ClientHandler`: một connection/một request, dispatch GET/HEAD/POST.
 - `HttpRequest`: parse request line, header, content length và path.
-- `FileService`: resolve web root, MIME và đọc resource.
-- `HttpResponse`: status line/header/body và quy tắc HEAD.
+- `FileService`: resolve web root, chặn traversal/symlink, lấy MIME và metadata resource.
+- `HttpResponse`: status line/header/body, quy tắc HEAD; file tĩnh được stream bằng `InputStream.transferTo()` thay vì nạp toàn bộ vào RAM.
 
 ## Client
 
@@ -31,4 +31,4 @@ flowchart LR
 
 Source nằm tại `src/main/java/lab4`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab4/test`. `RawHttpClient` và integration test không phụ thuộc JavaFX.
 
-`FileService` hiện vẫn đọc toàn bộ resource vào RAM; streaming media là bước tối ưu riêng sau khi UI/protocol ổn định.
+Response HTML nhỏ vẫn dùng `byte[]`; PDF/MP3/MP4 và file tĩnh được stream trực tiếp từ file đã kiểm tra vào TCP output stream.

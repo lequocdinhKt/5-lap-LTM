@@ -43,6 +43,12 @@ Chạy giữa hai máy:
 .\run-client.ps1 -EmbeddedMailServer
 ```
 
+Mở nhanh nhiều client trên mỗi máy để demo hai máy:
+
+```powershell
+.\run-demo-clients.ps1 -ServerHost <IP_MAY_A> -ClientCount 2
+```
+
 Máy A cần mở TCP `3025` và `3110`; script `configure-firewall.ps1` ở root thực hiện việc này.
 
 ## Kiểm tra localhost

@@ -11,6 +11,9 @@
 | Chạy nền | `runBackground()` | use case tương ứng | SMTP/POP3/DB không block UI |
 | Hiển thị inbox | `MailAppView.showInbox()` | danh sách `Mail` | — |
 | Server local riêng | script server | — | `LocalMailServerMain.main()` → `LocalMailServer.start()` |
+| Sidebar mailbox & điều hướng | `MailAppView.createScene()`, `showPage()` | — | — |
+| Trạng thái busy/toast/skeleton | `setBusy()`, `showInfo()`, `showError()`, `showInboxLoading()` | — | — |
+| Mở nhiều client demo | `run-demo-clients.ps1` | — | — |
 | Đóng tài nguyên | lifecycle app | `AppService.close()` | `LocalMailServer.close()` |
 
 Mọi thay đổi tên method/package phải cập nhật bảng này cùng commit.

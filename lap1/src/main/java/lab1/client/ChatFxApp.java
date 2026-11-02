@@ -2,6 +2,9 @@ package lab1.client;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import lab1.common.GroupInfo;
 import lab1.common.Protocol;
 import lab1.common.RecipientMode;
@@ -40,6 +44,9 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     private final TextField messageField = new TextField();
     private final Label conversationTitle = new Label("Chọn một cuộc trò chuyện");
     private final Label status = new Label("Sẵn sàng");
+    private final Label toast = new Label();
+    private PauseTransition toastTimer;
+    private final ProgressIndicator activity = new ProgressIndicator();
     private final Button sendButton = new Button("Gửi");
     private final Button attachButton = new Button("Đính kèm");
     private final Button emojiButton = new Button("😊");
@@ -56,10 +63,17 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         int port = parsePort(args.size() > 1 ? args.get(1) : null);
         String username = args.size() > 2 ? args.get(2) : "";
         String password = args.size() > 3 ? args.get(3) : "";
-        boolean auto = args.size() > 4 && "--connect".equalsIgnoreCase(args.get(4));
+        // Script demo: "--connect" tự đăng nhập; "--register" đăng ký trước khi vào.
+        boolean auto = hasFlag(args, "--connect");
+        boolean register = hasFlag(args, "--register");
         showLogin(host, port, username, password);
-        if (auto && !username.isBlank() && !password.isBlank()) {
-            Platform.runLater(() -> connect(host, port, username, password, false));
+        if (auto && !username.isBlank()) {
+            if (password.isBlank()) {
+                // Không truyền mật khẩu: dùng tài khoản demo quy ước "lab1-<tên>", tự đăng ký nếu chưa có.
+                Platform.runLater(() -> connectDemoAccount(host, port, username));
+            } else {
+                Platform.runLater(() -> connect(host, port, username, password, register));
+            }
         }
     }
 
@@ -71,7 +85,16 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         Spinner<Integer> tcp = new Spinner<>(1, 65_535, port);
         Button login = new Button("Đăng nhập");
         Button register = new Button("Đăng ký");
-        Label note = new Label("TCP: điều khiển/chat riêng | UDP: nhóm, tất cả và file");
+        login.getStyleClass().add("primary-button");
+        register.getStyleClass().add("secondary-button");
+        Label eyebrow = new Label("LAB 1 · LẬP TRÌNH MẠNG");
+        eyebrow.getStyleClass().add("eyebrow");
+        Label title = new Label("Kết nối Chat");
+        title.getStyleClass().add("page-title");
+        Label subtitle = new Label("Đăng nhập để chat TCP, multicast và broadcast UDP.");
+        subtitle.getStyleClass().add("muted-label");
+        Label note = new Label("TCP: điều khiển/chat riêng  •  UDP: nhóm, tất cả và file");
+        note.getStyleClass().add("hint-box");
         GridPane form = new GridPane();
         form.setHgap(10);
         form.setVgap(12);
@@ -82,16 +105,28 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         ColumnConstraints grow = new ColumnConstraints();
         grow.setHgrow(Priority.ALWAYS);
         form.getColumnConstraints().addAll(new ColumnConstraints(), grow);
-        VBox root = new VBox(18, new Label("CHAT CLIENT - SERVER"), form,
-                new HBox(10, register, login), note);
+        HBox actions = new HBox(10, register, login, activity);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        activity.setPrefSize(22, 22);
+        activity.setVisible(false);
+        activity.setManaged(false);
+        status.getStyleClass().setAll("status-badge", "status-neutral");
+        VBox card = new VBox(16, eyebrow, title, subtitle, form, actions, note, status);
+        card.getStyleClass().add("login-card");
+        VBox root = new VBox(card);
+        root.getStyleClass().add("app-background");
         root.setAlignment(Pos.CENTER);
-        root.setPadding(new Insets(28));
+        root.setPadding(new Insets(32));
         login.setDefaultButton(true);
         login.setOnAction(event -> connect(server.getText().trim(), tcp.getValue(),
                 name.getText().trim(), pass.getText(), false));
         register.setOnAction(event -> connect(server.getText().trim(), tcp.getValue(),
                 name.getText().trim(), pass.getText(), true));
-        stage.setScene(new Scene(root, 540, 410));
+        Scene scene = new Scene(root, 620, 560);
+        applyStyles(scene);
+        stage.setMinWidth(520);
+        stage.setMinHeight(500);
+        stage.setScene(scene);
         stage.setTitle("Lab 1 - Đăng nhập");
         stage.show();
     }
@@ -101,12 +136,23 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
             showError("Vui lòng nhập đủ thông tin.");
             return;
         }
+        connectAsync(() -> ClientConnection.connect(host, port, username, password, register));
+    }
+
+    /** Tài khoản demo cho script: mật khẩu quy ước "lab1-<tên>", tự đăng ký nếu chưa tồn tại. */
+    private void connectDemoAccount(String host, int port, String username) {
+        connectAsync(() -> ClientConnection.connect(host, port, username));
+    }
+
+    private void connectAsync(IoSupplier<ClientConnection> attempt) {
         status.setText("Đang kết nối TCP...");
+        setBusy(true);
         CompletableFuture.supplyAsync(() -> {
-            try { return ClientConnection.connect(host, port, username, password, register); }
+            try { return attempt.get(); }
             catch (IOException exception) { throw new RuntimeException(exception); }
         }).whenComplete((connected, error) -> Platform.runLater(() -> {
-            if (error != null) { showError(rootMessage(error)); return; }
+            setBusy(false);
+            if (error != null) { setStatus("Kết nối thất bại", "status-error"); showError(rootMessage(error)); return; }
             connection = connected;
             showChat();
             connection.startListening(this);
@@ -137,12 +183,20 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
             }
         });
         Button createGroup = new Button("+ Tạo nhóm");
+        createGroup.getStyleClass().add("secondary-button");
         createGroup.setMaxWidth(Double.MAX_VALUE);
         createGroup.setOnAction(event -> showCreateGroup());
-        VBox sidebar = new VBox(7, new Label("NGƯỜI ĐANG ONLINE"), users,
-                new Label("NHÓM UDP"), groups, createGroup);
-        sidebar.setPadding(new Insets(12));
-        sidebar.setPrefWidth(280);
+        Label brand = new Label("Network Chat");
+        brand.getStyleClass().add("sidebar-brand");
+        Label onlineTitle = new Label("NGƯỜI ĐANG ONLINE");
+        Label groupTitle = new Label("NHÓM UDP");
+        onlineTitle.getStyleClass().add("section-label");
+        groupTitle.getStyleClass().add("section-label");
+        VBox sidebar = new VBox(10, brand, onlineTitle, users, groupTitle, groups, createGroup);
+        sidebar.getStyleClass().add("sidebar");
+        sidebar.setPadding(new Insets(20));
+        sidebar.setPrefWidth(270);
+        sidebar.setMinWidth(210);
         VBox.setVgrow(users, Priority.SOMETIMES);
         VBox.setVgrow(groups, Priority.ALWAYS);
 
@@ -150,6 +204,9 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         HBox.setHgrow(spacer, Priority.ALWAYS);
         HBox header = new HBox(7, conversationTitle, spacer, membersButton, leaveButton, deleteButton);
         header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("topbar");
+        conversationTitle.getStyleClass().add("conversation-title");
+        deleteButton.getStyleClass().add("danger-button");
         membersButton.setOnAction(event -> withGroup(group ->
                 runIo(() -> connection.requestGroupMembers(group.id()), "Đã tải thành viên.")));
         leaveButton.setOnAction(event -> withGroup(group ->
@@ -157,20 +214,43 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         deleteButton.setOnAction(event -> withGroup(this::confirmDelete));
 
         messages.setPadding(new Insets(10));
+        messages.getStyleClass().add("message-list");
         ScrollPane scroll = new ScrollPane(messages);
         scroll.setFitToWidth(true);
+        scroll.getStyleClass().add("message-scroll");
         messages.heightProperty().addListener((value, oldHeight, newHeight) -> scroll.setVvalue(1));
         messageField.setPromptText("Nhập tin nhắn...");
         messageField.setOnAction(event -> sendCurrentText());
         sendButton.setOnAction(event -> sendCurrentText());
+        sendButton.getStyleClass().add("primary-button");
         attachButton.setOnAction(event -> sendCurrentFile());
         emojiButton.setOnAction(event -> showEmojiMenu());
         HBox composer = new HBox(7, emojiButton, attachButton, messageField, sendButton);
+        composer.getStyleClass().add("composer");
+        composer.setAlignment(Pos.CENTER);
         HBox.setHgrow(messageField, Priority.ALWAYS);
-        VBox center = new VBox(8, header, scroll, composer, status);
-        center.setPadding(new Insets(12));
+        status.getStyleClass().setAll("status-badge", "status-success");
+        activity.setPrefSize(18, 18);
+        HBox statusBar = new HBox(8, activity, status);
+        statusBar.setAlignment(Pos.CENTER_LEFT);
+        VBox center = new VBox(12, header, scroll, composer, statusBar);
+        center.getStyleClass().add("content-pane");
+        center.setPadding(new Insets(16));
         VBox.setVgrow(scroll, Priority.ALWAYS);
-        stage.setScene(new Scene(new BorderPane(center, null, null, null, sidebar), 1080, 710));
+        BorderPane shell = new BorderPane(center, null, null, null, sidebar);
+        shell.getStyleClass().add("app-shell");
+        toast.getStyleClass().add("toast");
+        toast.setVisible(false);
+        toast.setManaged(false);
+        toast.setOnMouseClicked(event -> hideToast());
+        StackPane root = new StackPane(shell, toast);
+        StackPane.setAlignment(toast, Pos.BOTTOM_CENTER);
+        StackPane.setMargin(toast, new Insets(0, 20, 22, 20));
+        Scene scene = new Scene(root, 1080, 710);
+        applyStyles(scene);
+        stage.setMinWidth(760);
+        stage.setMinHeight(560);
+        stage.setScene(scene);
         stage.setTitle("Lab 1 Chat - " + connection.username());
         stage.setOnCloseRequest(event -> connection.close());
         updateControls();
@@ -303,10 +383,9 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         Label body = new Label(message.text());
         body.setWrapText(true);
         VBox bubble = new VBox(3, head, body);
-        bubble.setPadding(new Insets(7, 10, 7, 10));
         bubble.setMaxWidth(550);
-        bubble.setStyle(mine ? "-fx-background-color:#d9edff;-fx-background-radius:10;"
-                : "-fx-background-color:white;-fx-border-color:#d5d9dd;-fx-background-radius:10;");
+        bubble.getStyleClass().addAll("message-bubble", mine ? "message-mine" : "message-other");
+        head.getStyleClass().add("message-meta");
         if (message.file() != null) {
             String label = message.kind() == null ? "Mở tệp" : "Mở " + message.kind().display;
             Hyperlink open = new Hyperlink(label);
@@ -316,6 +395,14 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         HBox row = new HBox(bubble);
         row.setAlignment(mine ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
         messages.getChildren().add(row);
+        FadeTransition fade = new FadeTransition(Duration.millis(180), row);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        TranslateTransition slide = new TranslateTransition(Duration.millis(180), row);
+        slide.setFromY(6);
+        slide.setToY(0);
+        fade.play();
+        slide.play();
     }
 
     private void openFile(Path file) {
@@ -364,12 +451,20 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     private void runIo(IoAction action, String success) { runIo(action, success, () -> { }); }
 
     private void runIo(IoAction action, String success, Runnable onSuccess) {
-        status.setText("Đang xử lý...");
+        setBusy(true);
+        setStatus("Đang xử lý...", "status-warning");
         CompletableFuture.runAsync(() -> {
             try { action.run(); } catch (IOException exception) { throw new RuntimeException(exception); }
         }).whenComplete((unused, error) -> Platform.runLater(() -> {
-            status.setText(error == null ? success : "Lỗi");
-            if (error == null) onSuccess.run(); else showError(rootMessage(error));
+            setBusy(false);
+            if (error == null) {
+                setStatus(success, "status-success");
+                showToast(success, false);
+                onSuccess.run();
+            } else {
+                setStatus("Có lỗi xảy ra", "status-error");
+                showToast(rootMessage(error), true);
+            }
         }));
     }
 
@@ -377,8 +472,13 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         Platform.runLater(() -> users.setItems(FXCollections.observableArrayList(
                 names.stream().filter(name -> !name.equals(connection.username())).toList())));
     }
-    @Override public void onSystemMessage(String message) { Platform.runLater(() -> status.setText(message)); }
-    @Override public void onError(String message) { Platform.runLater(() -> { status.setText(message); showError(message); }); }
+    @Override public void onSystemMessage(String message) {
+        Platform.runLater(() -> {
+            setStatus(message, "status-neutral");
+            showToast(message, false);
+        });
+    }
+    @Override public void onError(String message) { Platform.runLater(() -> { setStatus(message, "status-error"); showError(message); }); }
 
     @Override
     public void onText(String sender, RecipientMode mode, List<String> targets, long time, String text) {
@@ -445,7 +545,43 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     }
 
     @Override public void onDisconnected(String reason) {
-        Platform.runLater(() -> { status.setText(reason); messageField.setDisable(true); sendButton.setDisable(true); });
+        Platform.runLater(() -> { setStatus(reason, "status-error"); messageField.setDisable(true); sendButton.setDisable(true); });
+    }
+
+    private void setBusy(boolean busy) {
+        activity.setVisible(busy);
+        activity.setManaged(busy);
+    }
+
+    private void setStatus(String message, String stateClass) {
+        status.setText(message);
+        status.getStyleClass().setAll("status-badge", stateClass);
+    }
+
+    /** Toast ngắn gọn cho thao tác thành công/lỗi; lỗi giữ lâu hơn để người dùng kịp đọc. */
+    private void showToast(String message, boolean error) {
+        if (toastTimer != null) toastTimer.stop();
+        toast.setText((error ? "⚠  " : "✓  ") + message);
+        toast.getStyleClass().setAll("toast", error ? "toast-error" : "toast-success");
+        toast.setVisible(true);
+        toast.setManaged(true);
+        FadeTransition fade = new FadeTransition(Duration.millis(160), toast);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.play();
+        toastTimer = new PauseTransition(Duration.seconds(error ? 8 : 3));
+        toastTimer.setOnFinished(event -> hideToast());
+        toastTimer.play();
+    }
+
+    private void hideToast() {
+        toast.setVisible(false);
+        toast.setManaged(false);
+    }
+
+    private void applyStyles(Scene scene) {
+        var css = ChatFxApp.class.getResource("/css/lab1.css");
+        if (css != null) scene.getStylesheets().add(css.toExternalForm());
     }
 
     private String rootMessage(Throwable error) {
@@ -457,6 +593,10 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         new Alert(Alert.AlertType.ERROR, message == null ? "Có lỗi xảy ra." : message).showAndWait();
     }
     @Override public void stop() { if (connection != null) connection.close(); }
+
+    private static boolean hasFlag(List<String> args, String flag) {
+        return args.stream().anyMatch(value -> flag.equalsIgnoreCase(value));
+    }
 
     private static int parsePort(String value) {
         try {
@@ -483,5 +623,6 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
             return FILE;
         }
     }
+    @FunctionalInterface private interface IoSupplier<T> { T get() throws IOException; }
     @FunctionalInterface private interface IoAction { void run() throws IOException; }
 }

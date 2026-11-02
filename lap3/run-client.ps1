@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [string]$ServerHost = "127.0.0.1",
     [switch]$EmbeddedMailServer

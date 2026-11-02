@@ -15,6 +15,8 @@ public class MailApp extends Application {
 
         stage.setTitle("Lab 3 - Mail Client");
         stage.setScene(view.createScene());
+        stage.setMinWidth(760);
+        stage.setMinHeight(560);
         stage.setOnCloseRequest(event -> service.close());
         stage.show();
     }

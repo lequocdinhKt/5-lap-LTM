@@ -13,5 +13,9 @@
 | Gửi file/audio/video | nút đính kèm | `sendFile()` hoặc `sendGroupFile()` | `offerDirectFile()`/`offerGroupFile()` → `UdpFileRelay` |
 | ACK và retry file | tự động | `ClientUdpFiles` | `UdpFileRelay.deliverWithRetry()` |
 | Theo dõi server | `ServerFxApp.startServer()` | `ChatServer.startAsync()` | `ServerListener` |
+| Trạng thái UI (badge/toast) | `ChatFxApp.setStatus()`, `ChatFxApp.showToast()` | — | — |
+| Hiệu ứng danh sách chat | `ChatFxApp.addBubble()`, `renderConversation()` | — | — |
+| Tài khoản demo tự đăng nhập | `ChatFxApp.connectDemoAccount()` | `ClientConnection.connect(host, port, username)` | `ClientHandler.login()` |
+| Mở nhiều client demo | `run-demo-clients.ps1` | cờ `--connect`/`--register` trong `ChatFxApp.start()` | — |
 
 Khi đổi tên hoặc di chuyển method, cập nhật bảng này trong cùng commit.

@@ -15,6 +15,20 @@
 5. Đọc POP3 của `user2@localhost`, chỉ thư vừa gửi.
 6. Mở MySQL để chỉ lịch sử gửi đã lưu.
 
+## Mở nhanh nhiều client
+
+```powershell
+# Máy A (mail server + MySQL): 2 client
+.\run-demo-clients.ps1 -ServerHost localhost -ClientCount 2
+
+# Máy B: 2 client trỏ về IPv4 của máy A
+.\run-demo-clients.ps1 -ServerHost 192.168.1.10 -ClientCount 2
+```
+
+Một client dùng `user1@localhost` để gửi và client còn lại dùng `user2@localhost` để đọc;
+cả hai đăng nhập tài khoản ứng dụng riêng để lịch sử gửi tách nhau. Chỉ dùng `-EmbeddedMailServer`
+khi mở một client duy nhất, vì mỗi tiến trình sẽ chiếm port `3025`/`3110`.
+
 ## Kịch bản Gmail
 
 1. Chọn Gmail, nhập sender và App Password.

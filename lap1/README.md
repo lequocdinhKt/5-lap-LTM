@@ -80,6 +80,8 @@ Xem hướng dẫn đầy đủ tại [`HUONG_DAN_CHAY.md`](HUONG_DAN_CHAY.md).
 .\build.ps1
 .\run-server.ps1
 .\run-client.ps1
+.\run-demo-clients.ps1 -ServerHost localhost -ClientCount 3
+.\run-demo-clients.ps1 -ServerHost localhost -ClientCount 3 -AutoConnect
 ```
 
 ## Demo

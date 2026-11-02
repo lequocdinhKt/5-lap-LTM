@@ -14,6 +14,15 @@
 
 Test tự khởi động GreenMail, gửi SMTP từ user1, đọc POP3 user2 và kiểm tra subject/body. Đây là test bắt buộc trong `verify-all.ps1`.
 
+## Bằng chứng đã chạy
+
+- **02/11/2026:** `.\mvnw.cmd -B -q clean verify` tại `lap3` → thành công.
+- **02/11/2026:** `.\mvnw.cmd -q test-compile exec:java "-Dexec.mainClass=lab3.LocalMailIntegrationTest" "-Dexec.classpathScope=test"` → in `PASS: SMTP và POP3 localhost hoạt động.`
+- **02/11/2026:** `.\run-demo-clients.ps1 -ClientCount 2 -EmbeddedMailServer` → chặn đúng với thông báo
+  `Chỉ mở 1 client khi dùng -EmbeddedMailServer vì mỗi client sẽ chiếm port 3025/3110.`
+- **02/11/2026:** `.\run-demo-clients.ps1 -ServerHost 127.0.0.1 -ClientCount 1` → script chạy hết
+  và in `Đã mở 1 cửa sổ. Đăng nhập tài khoản ứng dụng, rồi gửi và đọc thư bằng SMTP/POP3.`
+
 ## Test thủ công
 
 - Sai password local/Gmail; email thiếu/không hợp lệ.

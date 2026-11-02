@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lab4.client.RawHttpClient;
@@ -51,6 +52,10 @@ public final class HttpIntegrationTest {
             require(head.getBody().length == 0, "HEAD không được có body");
             require("5".equals(head.getHeader("content-length")), "HEAD phải giữ Content-Length");
 
+            RawHttpClient.Response streamedFile = client.get(baseUrl + "/sample.pdf");
+            require(Arrays.equals(new byte[] {1, 2, 3, 4, 5}, streamedFile.getBody()),
+                    "GET file stream phải giữ nguyên từng byte");
+
             RawHttpClient.Response post = client.postForm(baseUrl + "/submit", "An", "Xin chào");
             require(post.getStatusCode() == 200, "POST /submit phải trả 200");
             require(new String(post.getBody(), StandardCharsets.UTF_8).contains("Xin chào"),
@@ -64,7 +69,7 @@ public final class HttpIntegrationTest {
                     "GET /%2e%2e/secret.txt HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n") == 400,
                     "Path traversal phải trả 400");
 
-            System.out.println("PASS: GET, HEAD, POST, 404, 405 và path traversal hoạt động.");
+            System.out.println("PASS: GET stream, HEAD, POST, 404, 405 và path traversal hoạt động.");
         } finally {
             server.stop();
             serverThread.join(5_000);
