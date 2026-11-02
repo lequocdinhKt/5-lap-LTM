@@ -1,0 +1,23 @@
+---
+description: Yêu cầu 5 lab môn LTM — chấm theo mức hoàn thiện và hiểu chương trình
+alwaysApply: true
+---
+
+# Đề bài 5 lab LTM
+
+Đánh giá theo mức hoàn thiện và khả năng giải thích code (TCP/UDP, giao thức).
+
+| Lab | Thư mục | Bài | Bắt buộc | Chấm | Gợi ý |
+|-----|---------|-----|----------|------|--------|
+| 1 | `lap1/` | Chat Client–Server hoặc P2P | UI thân thiện; multicast + broadcast; emoji; text/audio/video; đính kèm; DB càng tốt | 5–6 client; hỏi TCP–UDP | Zalo, Messenger |
+| 2 | `lap2/` | FTP Server (kèm client) hoặc FTP Client | Giao thức FTP | Server có database | FileZilla |
+| 3 | `lap3/` | Mail Server (kèm client) hoặc Mail Client | POP3 và SMTP | Gửi Gmail + localhost; DB trên server | Gmail |
+| 4 | `lap4/` | Web Server (kèm) hoặc Web Client | Giao thức HTTP | Nhiều dịch vụ (.pdf, .mp3, .mp4); browser GET/HEAD/POST, history, download | Chrome, Cốc Cốc |
+| 5 | `lap5/` | RMI đồng bộ dữ liệu 2 server | RMI | 2 server máy thật; client trên máy ảo | |
+
+## Hiện trạng
+
+- Có: `lap1`, `lap3`, `lap4`.
+- Thiếu: `lap2`, `lap5`.
+
+Không gộp hai lab vào một process/port/database. Mỗi lab tự chạy, tự README, tự script.

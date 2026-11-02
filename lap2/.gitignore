@@ -1,0 +1,7 @@
+out/
+lib/
+db.properties
+ftp-root/*/*
+!ftp-root/*/.gitkeep
+*.downloading
+*.uploading

@@ -1,0 +1,4 @@
+db.url=jdbc:mysql://localhost:3306
+db.name=lab2_ftp
+db.user=root
+db.password=YOUR_MYSQL_PASSWORD
