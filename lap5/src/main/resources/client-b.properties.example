@@ -1,0 +1,4 @@
+server.host=
+rmi.registry.port=1099
+client.id=client-b
+client.username=staff_b

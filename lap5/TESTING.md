@@ -1,24 +1,22 @@
-# Kiểm thử Lab 5 — kế hoạch
+# Kiểm thử Lab 5
 
-## Unit test
+## Bằng chứng ngày 03/11/2026
 
-- Validation và thao tác dữ liệu.
-- So sánh version/chính sách conflict.
-- Queue/retry replication nếu có.
+- Biên dịch trực tiếp bằng JDK 17 và chạy JUnit Platform: 49/49 test thành công.
+- MariaDB 10.4.32: 43 kiểm tra database/RMI thành công với hai database tạm trên cùng máy. Đã thử schema mới và bản sao cấu trúc database đang dùng.
+- Bao gồm đăng nhập, đăng ký đồng bộ UUID, CRUD, lock cạnh tranh, nhập/xuất hai chiều, giao dịch trùng, rollback khi peer offline và từ chối xuất quá tồn kho.
+- `scripts/schema.sql` đã tạo bảng và chạy seed thành công; các database thử đã được xóa, dữ liệu lab gốc giữ nguyên.
+- Test JDBC/RMI bổ sung dùng harness tạm trong môi trường kiểm tra; harness này không đóng gói trong repo. Unit test nằm trong `src/test/java`.
 
-## Integration test
+- Bản nhập trong repo đích đã chạy Maven `clean verify` bằng JDK 21 thành công: 49 test, đóng gói đủ JAR thường và JAR `-all`.
 
-- Khởi động hai registry/server trên port test tách biệt.
-- Ghi A → đọc B; ghi B → đọc A nếu hai chiều.
-- Dữ liệu Unicode và object serialization.
-- Một peer offline, restart và hội tụ.
-- Concurrent update và duplicate retry/idempotency.
+## Chạy lại
 
-## Test bốn máy
+Trong `lap5`, chạy `.\mvnw.cmd clean verify` với JDK 21 hoặc `mvn clean verify` với JDK 17 trở lên. Lần đầu cần Internet để tải Maven/dependency.
 
-- Stub quảng bá đúng IPv4, không phải `127.0.0.1`.
-- Windows Firewall mở cả registry port và remote object port.
-- VM network mode cho phép tới hai máy thật.
-- Server/storage độc lập và clock/timezone nhất quán.
+## Còn chờ nghiệm thu
 
-Lệnh build/test sẽ được điền khi có `pom.xml` và code thật.
+- Hai máy thật và hai VM: IP quảng bá trong stub, firewall 1099–1102, độ trễ và mất kết nối LAN.
+- Ảnh/video UI, demo giảng viên và đối chiếu toàn bộ REQUIREMENTS/DEFINITION_OF_DONE.
+- Chưa khẳng định đạt JavaFX/Docker theo chuẩn chung; bản hiện tại dùng Swing/MariaDB.
+- Không có bảo đảm commit nguyên tử trên hai database; xem PROTOCOL.md.

@@ -1,5 +1,7 @@
 # Tiến độ dự án 5 Lab Lập trình mạng
 
+- [x] ✅ **03/11/2026:** Đã nhập mã nguồn kho RMI vào `lap5`; chỉ cập nhật Lab 5 và tài liệu trạng thái chung. Không thay đổi Lab 1–4. Đã có bằng chứng 49 unit test và 43 kiểm tra MariaDB/RMI trên máy A; Maven clean verify với JDK 21 đã thành công (49 test); chưa nghiệm thu LAN.
+
 Cập nhật gần nhất: **02/11/2026**
 
 Baseline đã kiểm tra: commit `7265f1e` (nhánh `main`)
@@ -23,7 +25,7 @@ Trạng thái hiện tại: **Giai đoạn 4 đã xong; Lab 1–4 build sạch, 
 - [x] ✅ Giai đoạn 3 — Chuẩn hóa Maven layout/package cho Lab 1–4.
 - [x] ✅ Giai đoạn 4 — Áp dụng design system JavaFX cho cả Lab 1–4; cả bốn lab build sạch.
 - [ ] ⏸️ Giai đoạn 5 — Test tự động Lab 1–4 đã xong; demo hai máy, ảnh, video và hồ sơ bảo vệ đang chờ Máy A/B và người thực hiện.
-- [ ] 🚫 Giai đoạn 6 — Tích hợp Lab 5; chờ code từ thành viên nhóm.
+- [ ] ⏸️ Giai đoạn 6 — Đã nhập mã Lab 5 và build/test local; còn demo LAN và chuẩn hóa JavaFX/Docker.
 
 ## Việc đang làm
 
@@ -106,8 +108,8 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 ## Lab 5 — RMI
 
 - [x] ✅ Đã có README, requirements, architecture, feature map khung, protocol, demo, testing và troubleshooting.
-- [ ] 🚫 Mã nguồn, Maven, remote interface và storage — chờ thành viên nhóm push.
-- [ ] 🚫 Chốt registry/object port và chiến lược đồng bộ — phải review code thật trước.
+- [x] ✅ Đã nhập mã nguồn, Maven Wrapper, remote interface và schema MariaDB vào lap5; Maven clean verify JDK 21 đạt 49 test.
+- [x] ✅ Đã ghi contract RMI, port 1099–1102, đồng bộ hai chiều và giới hạn commit vào lap5/PROTOCOL.md.
 - [ ] 🚫 Test/demo bốn máy — cần hai máy thật, hai máy ảo và code hoàn chỉnh.
 
 ## Vì sao công việc đang dừng
@@ -122,7 +124,7 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 | Demo hai máy | Tạm dừng | Phiên hiện tại chỉ kiểm tra được trên một máy | Có Máy A/B cùng LAN và quyền firewall |
 | Gmail thật | Tạm dừng | Không lưu App Password trong repo | Người dùng nhập tài khoản demo khi kiểm tra |
 | Ảnh/video | Tạm dừng | UI cuối đã xong nhưng cần thao tác trên giao diện thật | Chụp/quay sau khi demo hai máy chạy được |
-| Lab 5 | Bị chặn | Chưa có code của thành viên nhóm | Thành viên nhóm push code lên repository |
+| Lab 5 | Tạm dừng nghiệm thu | Code và build local đã có; chưa demo LAN hoặc chuẩn hóa JavaFX/Docker | Xem lap5/TESTING.md và chạy hai máy thật |
 
 ## Lịch sử cập nhật
 
@@ -137,3 +139,5 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 - **02/11/2026:** Chẩn đoán `ChatIntegrationTest` Lab 1: MySQL80 đang chạy (port 3306 mở) nhưng `lap1/db.properties` dùng `db.user=lap1` và bị `Access denied`; `.env` ở root không tồn tại. Đã ghi nhận vào bảng “Vì sao công việc đang dừng” và sửa lại phần bằng chứng trong `lap1/TESTING.md`.
 - **02/11/2026:** Sửa `setup-windows.ps1` để chạy được trên Windows PowerShell 5.1 (NativeCommandError từ `java -version` và `docker compose up -d`), chuyển MySQL sang Docker ở cổng `3307` vì `3306` bị MySQL80 chiếm; cập nhật `README.md` và `.env.example`.
 - **02/11/2026:** `ChatIntegrationTest` Lab 1 đạt 13/13 `[PASS]` trên MySQL Docker; cập nhật lại bằng chứng trong `lap1/TESTING.md` và trạng thái MySQL trong `PROGRESS.md` từ “Bị chặn” sang “Hoàn thành”.
+
+- **03/11/2026:** Nhập mã kho RMI từ Lap8_LTM vào lap5, cập nhật tài liệu lab và thêm Maven Wrapper; giữ nguyên Lab 1–4. Bằng chứng local: 49 unit test, 43 kiểm tra MariaDB/RMI. Chưa nghiệm thu LAN/JavaFX/Docker; xem lap5/TESTING.md.

@@ -1,23 +1,10 @@
-# Xử lý lỗi Lab 5 — khung
+# Xử lý lỗi Lab 5
 
-## Client lookup thất bại
+- Thiếu JAR: build trong `lap5` bằng `.\mvnw.cmd clean verify`. Script cần `target/Lap8_LTM-1.0.0-SNAPSHOT-all.jar`.
+- Thiếu properties: copy mẫu từ `src/main/resources` ra thư mục `lap5`, bỏ đuôi `.example`, sửa IP và thông tin database.
+- Database chưa có bảng: trên database mới chạy `scripts/schema.sql` rồi `scripts/demo-seed.sql`. Không seed lại database đã có dữ liệu.
+- Registry kết nối được nhưng gọi service/lock lỗi: mở cả 1099, 1100, 1101, 1102; kiểm tra IP trong stub và coordinator A.
+- Không ghi/đăng ký được khi peer tắt: hành vi chủ động của bản này; chạy cả hai server và dùng cùng JAR.
+- Dữ liệu lệch sau mất kết nối: dừng demo ghi, đối soát dữ liệu hai database; chưa có two-phase commit hoặc cơ chế tự sửa lệch.
 
-Kiểm tra IP/registry port, service name, firewall và registry đã bind object. Không quảng bá `localhost` cho client ở máy khác.
-
-## Kết nối registry được nhưng gọi method lỗi
-
-RMI có thể dùng port remote object khác registry. Chốt port cố định hoặc mở đúng firewall; kiểm tra `java.rmi.server.hostname` của từng server.
-
-## Serialization lỗi
-
-Client/server phải dùng DTO tương thích, cùng `serialVersionUID`; không truyền JavaFX control, socket hoặc database connection qua RMI.
-
-## Dữ liệu không đồng bộ
-
-So sánh log/version ở A và B, kiểm tra peer address, retry queue và conflict policy. Không sửa trực tiếp storage để che lỗi replication.
-
-## VM không thấy máy thật
-
-Kiểm tra NAT/bridged/host-only theo topology được chọn, ping nếu được phép và `Test-NetConnection` tới từng port. Ghi cấu hình cuối cùng vào `DEMO_TOPOLOGY.md`.
-
-Nội dung sẽ được cập nhật bằng lỗi thực tế sau khi code Lab 5 được tích hợp.
+Xem phần xử lý lỗi trong [README](README.md). Docker/setup/firewall chung của Lab 1–4 chưa cấu hình Lab 5.

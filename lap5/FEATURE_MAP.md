@@ -1,14 +1,15 @@
-# Feature Map Lab 5 — chờ code
+# Feature Map Lab 5
 
-| Chức năng bắt buộc | Class/method cần điền | Bằng chứng |
-|---|---|---|
-| Khởi động Registry A/B | Chưa có code | log bind/rebind |
-| Client lookup server | Chưa có code | kết nối từ hai VM |
-| Tạo/cập nhật/xóa dữ liệu | Chưa có code | UI + storage local |
-| Server A đồng bộ sang B | Chưa có code | đọc kết quả từ B |
-| Server B đồng bộ sang A | Chưa chốt thiết kế | đọc kết quả từ A |
-| Phát hiện version/xung đột | Chưa chốt thiết kế | test concurrent update |
-| Retry sau mất kết nối | Chưa có code | tắt/bật lại server |
-| Hiển thị trạng thái | Chưa có code | badge/timeline UI |
+| Chức năng | Class / method |
+|---|---|
+| Khởi động registry và bind | `ServerLauncher.startServer` |
+| Kết nối client | `WarehouseClient.connect` |
+| Đăng nhập / đăng ký và đồng bộ user | `WarehouseServiceImpl.login/register`, `SyncServiceImpl.syncUser` |
+| Tạo / sửa / xóa sản phẩm | `WarehouseServiceImpl.createProduct/updateProduct/deleteProduct` |
+| Nhập / xuất / lịch sử | `WarehouseServiceImpl.changeInventory/transactionHistory` |
+| Đồng bộ hai chiều | `SyncServiceImpl.syncCreateProduct/syncUpdateProduct/syncDeleteProduct/syncInventory` |
+| Lock, lease, fencing | `LockManager.acquire/heartbeat/release/validate` |
+| Kết nối lại coordinator | `ReconnectingLockService` |
+| Swing UI | `ServerMonitorFrame`, `ConnectionFrame`, `ClientAccessFrame`, `DashboardFrame` |
 
-Không điền tên giả. Cập nhật bảng ngay sau khi code của thành viên nhóm được merge và review.
+Mã nguồn nằm dưới `src/main/java/com/warehouse`. Xem [kiểm thử](TESTING.md) để phân biệt bằng chứng local và demo LAN còn chờ.

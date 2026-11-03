@@ -1,5 +1,7 @@
 # 5 Lab Lập Trình Mạng - môi trường Windows thống nhất
 
+**Lab 5 đã có mã nguồn:** xem [hướng dẫn kho RMI](lap5/README.md). Bản nhập từ `Lap8_LTM` dùng Swing/MariaDB và chạy độc lập trong `lap5`; chưa tích hợp Docker, JavaFX hoặc script setup/verify chung của Lab 1–4. Dùng `lap5\mvnw.cmd` để build riêng.
+
 ## Project harness
 
 - [Tiến độ hiện tại và lý do tạm dừng](PROGRESS.md)

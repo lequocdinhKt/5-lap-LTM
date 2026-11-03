@@ -1,27 +1,18 @@
-# Kiến trúc Lab 5 — dự kiến
+# Kiến trúc Lab 5
+
+Mỗi client Swing gọi RMI WarehouseService và LockService. Hai server lưu MariaDB riêng, gọi SyncService của nhau để đồng bộ trực tiếp. Server A điều phối lock; Server B chuyển tiếp thao tác lock tới A.
 
 ```mermaid
 flowchart LR
-    C1[VM Client 1] --> RA[RMI Registry A]
-    C2[VM Client 2] --> RB[RMI Registry B]
-    RA --> SA[Server A / Remote Service]
-    RB --> SB[Server B / Remote Service]
-    SA <--> SYNC[Replication Service]
-    SYNC <--> SB
-    SA --> DA[(Storage A)]
-    SB --> DB[(Storage B)]
+    C1[Client A Swing] --> A[Server A]
+    C2[Client B Swing] --> B[Server B]
+    A <--> B
+    A --> DA[(MariaDB A)]
+    B --> DB[(MariaDB B)]
+    B --> LA[Lock coordinator A]
+    A --> LA
 ```
 
-## Ranh giới dự kiến
+Package `common` chứa DTO/model/remote interface; `server.service` điều phối nghiệp vụ; `server.dao` thao tác JDBC; `server.sync` nhận đồng bộ; `server.lock` quản lý lease/fencing; `client.ui` và `server.ui` chứa Swing.
 
-- `remote`: remote interface, DTO serializable và exception contract.
-- `server`: implementation, registry bootstrap và lifecycle.
-- `service`: nghiệp vụ, version/xung đột và replication.
-- `storage`: dữ liệu độc lập của từng server.
-- `client`/`ui`: lookup stub, gọi remote và trạng thái kết nối.
-
-Tên package/class cuối cùng phải theo code thật. Không xây abstraction trước khi review code được push.
-
-## Luồng cần giải thích
-
-Client lookup registry → nhận stub → gọi remote method → server validate/lưu local → replicate sang peer → trả kết quả/version → client cập nhật UI.
+Xem [kiến trúc chi tiết](docs/architecture.md), [contract](PROTOCOL.md) và [giới hạn nhất quán](README.md#10-xử-lý-lỗi-thường-gặp).
