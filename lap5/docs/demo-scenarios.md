@@ -1,9 +1,12 @@
-# Kịch bản demo
+# Kịch bản demo chi tiết
 
-1. Thêm SP011 ở Client A và kiểm tra hai database.
-2. Xuất 5 SP001, kiểm tra tồn kho hai server.
-3. Mở thao tác sửa SP003 ở Client A để giữ khóa, rồi thử sửa SP003 từ Client B.
-4. Sửa SP001 và SP002 song song.
-5. Tắt client giữ lock, chờ lease hết hạn rồi xin lại.
-6. Ngắt peer, xác minh thao tác ghi bị từ chối và dữ liệu cục bộ không đổi; nối lại peer trước khi thao tác tiếp.
-7. Xuất vượt tồn, xác minh transaction bị từ chối.
+1. Đăng ký tài khoản tại A, đăng nhập tài khoản đó qua B.
+2. Thêm một sản phẩm tại A; tìm kiếm và xem chi tiết tại B.
+3. Sửa sản phẩm tại B; kiểm tra A nhận đúng version và fencing token.
+4. Nhập rồi xuất hàng ở hai chiều; lịch sử và tồn kho hai database phải giống nhau.
+5. Hai client tranh sửa cùng sản phẩm; chỉ lease hợp lệ được ghi.
+6. Dừng heartbeat, chờ 30 giây rồi xin lease mới; thử fencing token cũ và xác minh bị từ chối.
+7. Gửi lại cùng UUID transaction; tồn kho không thay đổi lần hai.
+8. Tắt Server B; thao tác ghi tại A phải lỗi và nguồn rollback. Bật lại B và thực hiện một thao tác mới.
+9. Thử mã sản phẩm trùng, dữ liệu không hợp lệ, xuất vượt tồn, port bận và database tắt.
+10. Lưu ảnh hai server dashboard, hai client và video lỗi peer có chủ đích.

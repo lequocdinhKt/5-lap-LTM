@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-$labs = @("lap1", "lap2", "lap3", "lap4")
+$labs = @("lap1", "lap2", "lap3", "lap4", "lap5")
 $failed = @()
 
 foreach ($lab in $labs) {
@@ -43,4 +43,4 @@ try {
     Pop-Location
 }
 
-Write-Host "`nTất cả lab 1-4 đã build thành công." -ForegroundColor Green
+Write-Host "`nTất cả Lab 1-5 đã build thành công." -ForegroundColor Green

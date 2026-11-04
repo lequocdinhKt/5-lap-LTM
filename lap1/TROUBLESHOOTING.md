@@ -8,7 +8,7 @@
 
 ## Đăng nhập/database lỗi
 
-- Chạy `docker compose ps` ở root và chờ MySQL healthy.
+- Kiểm tra Windows service MySQL đang `Running` và thử `Test-NetConnection 127.0.0.1 -Port 3306`.
 - Kiểm tra `db.properties` cục bộ hoặc các biến `LTM_DB_*`; không commit mật khẩu.
 - Chạy lại `setup-windows.ps1` nếu file cấu hình chưa được tạo.
 

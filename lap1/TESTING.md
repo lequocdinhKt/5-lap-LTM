@@ -16,8 +16,8 @@
   → 13 dòng `[PASS]` (6 client đăng ký/đăng nhập MySQL, TCP DIRECT, multicast, broadcast, file UDP đúng byte,
   từ chối file > 20 MB, khởi động lại giữ tài khoản MySQL) và kết thúc bằng
   `TẤT CẢ KIỂM THỬ TÍCH HỢP ĐÃ THÀNH CÔNG.`
-- Test chạy trên MySQL 8.4.13 của `compose.yaml` (container `ltm-mysql`, `127.0.0.1:3307`).
-  Trên máy đã có MySQL cài trực tiếp chiếm `3306`, đặt `MYSQL_PORT=3307` trong `.env` rồi chạy `setup-windows.ps1`.
+- Ngày 04/11/2026 chạy lại đầy đủ trên dịch vụ MySQL80 local ở `127.0.0.1:3306`.
+  Cấu hình hiện tại chỉ hỗ trợ MySQL Server cài local; chạy `setup-windows.ps1` để tạo lại `db.properties`.
 
 ## Integration test hiện có
 

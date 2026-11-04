@@ -1,6 +1,6 @@
 # 5 Lab Lập Trình Mạng - môi trường Windows thống nhất
 
-**Lab 5 đã có mã nguồn:** xem [hướng dẫn kho RMI](lap5/README.md). Bản nhập từ `Lap8_LTM` dùng Swing/MariaDB và chạy độc lập trong `lap5`; chưa tích hợp Docker, JavaFX hoặc script setup/verify chung của Lab 1–4. Dùng `lap5\mvnw.cmd` để build riêng.
+**Lab 5 đã được chuẩn hóa:** xem [hướng dẫn kho RMI](lap5/README.md). Cả năm lab là Maven project độc lập, dùng JavaFX và build chung qua `verify-all.ps1`.
 
 ## Project harness
 
@@ -17,12 +17,12 @@ Repository dùng một quy ước chung cho hai máy Windows:
 
 - Temurin JDK 21 x64 trên cả hai máy; mã nguồn biên dịch ở mức Java 17.
 - Mỗi lab là một Maven project độc lập và có Maven Wrapper riêng.
-- MySQL 8.4.13 chạy bằng Docker; toàn bộ ứng dụng giao diện dùng JavaFX và chạy trực tiếp trên Windows.
+- MySQL Server 8.x cài local trên từng máy cần database; toàn bộ ứng dụng giao diện dùng JavaFX và chạy trực tiếp trên Windows.
 - Không dùng file `.class`, `target`, `out` hoặc JAR được build từ máy khác.
 
 ## Cài lần đầu trên mỗi máy
 
-1. Cài Temurin JDK 21 x64 và Docker Desktop.
+1. Cài Temurin JDK 21 x64 và MySQL Server 8.x; ghi nhớ tài khoản MySQL local.
 2. Clone repository.
 3. Mở PowerShell tại thư mục này và chạy:
 
@@ -31,28 +31,20 @@ Repository dùng một quy ước chung cho hai máy Windows:
 .\verify-all.ps1
 ```
 
-`setup-windows.ps1` tự tạo mật khẩu MySQL cục bộ trong `.env`, tạo `db.properties`
-cho lab 1-3 và khởi động MySQL. Các file cấu hình cục bộ không được commit.
+`setup-windows.ps1` tự tìm `mysql.exe`, kiểm tra kết nối MySQL local rồi hỏi mật khẩu bằng ô nhập kín nếu `.env` chưa có. Script tạo `.env` và `db.properties` cho Lab 1–3; các file chứa mật khẩu đều bị ignore.
 
-Docker Desktop phải **đang chạy** trước khi gọi `setup-windows.ps1`. Nếu máy đã cài MySQL trực tiếp
-chiếm cổng `3306`, mở `.env` và đặt `MYSQL_PORT=3307` rồi chạy lại script; cổng đó được dùng cho cả
-container lẫn `db.properties` của lab 1-3. Script chỉ **cảnh báo** (không dừng) khi JDK không phải 21.
-
-Kiểm tra và dọn MySQL:
+Nếu MySQL dùng host, port hoặc user khác mặc định:
 
 ```powershell
-docker compose ps        # ltm-mysql phải là Up (healthy)
-docker compose down      # dừng và xoá container, giữ volume dữ liệu
+.\setup-windows.ps1 -MySqlHost 127.0.0.1 -MySqlPort 3306 -MySqlUser root
+Get-Service MySQL*
+Test-NetConnection 127.0.0.1 -Port 3306
 ```
+
+Script chỉ cảnh báo khi JDK không phải 21 và không tự cài, khởi động hay xóa MySQL service.
 
 Trong CI hoặc khi không muốn tạo file, cả ba lab cũng nhận các biến
 `LTM_DB_URL`, `LTM_DB_NAME`, `LTM_DB_USER` và `LTM_DB_PASSWORD`.
-
-Nếu máy đã cài MySQL trực tiếp, dùng:
-
-```powershell
-.\setup-windows.ps1 -SkipDocker
-```
 
 ## Chạy giữa hai máy
 
@@ -70,6 +62,7 @@ Các cổng sử dụng:
 - Lab 2: TCP 2121 và PASV TCP 30000-30020.
 - Lab 3: SMTP 3025 và POP3 3110.
 - Lab 4: HTTP 8080.
+- Lab 5: RMI Registry 1099, Warehouse 1100, Sync 1101 và Lock 1102.
 
 MySQL chỉ publish lên `127.0.0.1`; không cần mở cổng 3306 ra LAN khi server ứng dụng
 và database chạy cùng máy.

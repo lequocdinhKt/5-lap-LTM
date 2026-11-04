@@ -37,7 +37,7 @@ FTP Client ── TCP data tạm thời ──> FTP Server (PASV)
 ## Yêu cầu
 
 - Temurin JDK 21 x64; Maven biên dịch mã ở mức Java 17.
-- MySQL từ môi trường Docker chung ở root hoặc MySQL 8.4 cài trực tiếp.
+- MySQL Server 8.x cài local trên máy chạy server.
 - PowerShell và kết nối Internet trong lần build đầu để Maven tải dependency.
 
 ## Chuẩn bị MySQL

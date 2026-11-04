@@ -1,22 +1,27 @@
 # Yêu cầu Lab 5 — RMI
 
-## Bắt buộc theo đề
+## Phạm vi đã triển khai
 
-- Dùng Java RMI để đồng bộ dữ liệu trên hai server.
-- Hai server chạy trên hai máy thật.
-- Các client chạy trên máy ảo; topology nhóm chọn hai VM client.
+- JavaFX client: kết nối, đăng nhập/đăng ký, tìm kiếm, bảng/chi tiết sản phẩm, CRUD, nhập/xuất và lịch sử.
+- JavaFX server: trạng thái MySQL, RMI local, peer, lock coordinator và timeline đồng bộ.
+- Hai server đồng bộ trực tiếp hai chiều qua Java RMI; mỗi server có MySQL Server 8.x local riêng.
+- Lock lease/fencing, heartbeat, idempotency giao dịch và rollback nguồn khi peer offline.
+- Cấu hình không chứa secret trong mã nguồn; hỗ trợ tham số, `LAB5_*`, properties cục bộ và default.
+- Chạy Windows bằng Maven Wrapper; Maven compile release 17, môi trường nghiệm thu JDK 21.
 
-## Cần chốt sau khi có code
+## Topology nghiệm thu
 
-- Loại dữ liệu được đồng bộ và thao tác client.
-- Registry port, remote object port và cách quảng bá hostname.
-- Lưu RAM, file hay database ở từng server.
-- Đồng bộ chủ động/bị động, hai chiều hay primary–replica.
-- Version dữ liệu, xử lý xung đột, retry và hành vi khi một server offline.
+- Máy thật A: Server A, MySQL local A và lock coordinator.
+- Máy thật B: Server B, MySQL local B.
+- VM A: Client A kết nối Server A.
+- VM B: Client B kết nối Server B.
+- Mở TCP `1099–1102` trên hai máy server; không dùng `localhost` giữa các máy.
 
-## Tiêu chí nghiệm thu dự kiến
+## Tiêu chí hoàn thành
 
-- Client ghi qua Server A và đọc được kết quả từ Server B, và ngược lại nếu thiết kế hai chiều.
-- Hai server có storage độc lập; không dùng chung folder/database để giả lập đồng bộ.
-- Tắt một server không làm mất dữ liệu đã xác nhận; khi chạy lại có cơ chế hội tụ rõ ràng.
-- Demo bốn máy, test tự động và Feature Map tới method thật.
+- Build/test Maven thành công trên JDK 21.
+- Integration test hai schema/port local thành công.
+- Demo A→B và B→A cho đăng ký, CRUD, tồn kho và lịch sử.
+- Chứng minh tranh lock, hết lease, fencing cũ, transaction trùng và rollback khi peer offline.
+- Có ảnh hai dashboard, hai client và video lỗi có chủ đích.
+- Nêu đúng giới hạn đồng bộ trực tiếp, không quảng bá là 2PC hoặc tự hội tụ.

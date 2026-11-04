@@ -1,15 +1,20 @@
 # Contract RMI Lab 5
 
-- Registry TCP `1099`: tên `warehouse`, `lock`, `sync` (xem `RmiNames`).
-- Warehouse service TCP `1100`; Sync service TCP `1101`; Lock TCP `1102` trên cả A/B. Port object được tính từ `rmi.service.port`.
-- Server A là coordinator khóa duy nhất. Server B dùng `ReconnectingLockService` chuyển tiếp tới A.
-- `java.rmi.server.hostname` lấy từ IP LAN đã chọn. Hai server dùng database độc lập.
+- Registry TCP `1099`, binding `warehouse`, `sync`, `lock`.
+- Warehouse object TCP `1100`, Sync object TCP `1101`, Lock object TCP `1102`.
 - `WarehouseService`: login/register, list/create/update/delete product, changeInventory, transactionHistory, isPeerAvailable.
-- `LockService`: acquire, heartbeat, release, validate; lease mặc định 30 giây, client heartbeat mỗi 10 giây.
-- `SyncService`: ping, syncUser, syncCreateProduct, syncUpdateProduct, syncDeleteProduct, syncInventory. DTO truyền qua RMI triển khai Serializable.
-- Ghi cục bộ trong transaction, gọi peer, chỉ commit nguồn sau khi peer xác nhận; lỗi peer thì rollback nguồn. Không có outbox/retry ghi tự động.
-- CREATE trùng mã khác UUID bị từ chối; CREATE lại cùng UUID/mã được xác nhận mà không ghi đè.
-- Inventory khóa dòng trước khi kiểm tra UUID giao dịch; giao dịch đã nhận không đổi lại tồn kho. Giao dịch cũ/sai số lượng trước bị từ chối.
-- `applyEvent` cũ trả false, không xác nhận giả rằng đã áp dụng event.
+- `LockService`: acquire, heartbeat, release, validate; lease mặc định 30 giây, heartbeat client 10 giây.
+- `SyncService`: ping, syncUser, syncCreateProduct, syncUpdateProduct, syncDeleteProduct, syncInventory.
+- DTO tuần tự hóa: `Product`, `InventoryTransaction`, `ProductInput`, `LockLease`, `LoginResult`, `RegistrationResult`.
+- Hai server và client phải dùng cùng một build `lab5.*`; không tương thích nhị phân với JAR `com.warehouse.*` cũ.
 
-Giới hạn: đây không phải two-phase commit. Nếu peer commit nhưng nguồn lỗi commit hoặc mất phản hồi, dữ liệu có thể lệch; cần đối soát thủ công trước khi tiếp tục. Cùng một JAR mới phải được dùng trên cả hai server/client.
+Quy tắc ghi:
+
+1. Nguồn mở transaction và ghi dữ liệu cục bộ.
+2. Nguồn gọi peer trực tiếp và chờ `true`.
+3. Peer ghi MySQL cục bộ rồi phản hồi.
+4. Nguồn chỉ commit sau phản hồi thành công; lỗi peer làm nguồn rollback.
+
+CREATE lại cùng UUID/mã được xác nhận mà không ghi đè; mã trùng với UUID khác bị từ chối. Inventory khóa dòng, kiểm tra UUID giao dịch trước khi so tồn kho; transaction trùng không làm tồn kho thay đổi lần hai. Fencing token cũ và thứ tự tồn kho sai bị từ chối.
+
+Đã loại bỏ `applyEvent`, `SyncEvent`, JSON codec và outbox cũ. Không có retry/outbox tự hội tụ. Đây không phải 2PC; mất phản hồi sau khi peer commit cần đối soát thủ công.

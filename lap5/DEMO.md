@@ -1,13 +1,29 @@
 # Demo Lab 5
 
-Theo đề: Server A/MariaDB A trên máy thật A; Server B/MariaDB B trên máy thật B; hai client trên hai VM. Bản README cũng hướng dẫn phương án mỗi VM chạy cả server/database/client; cần chọn đúng topology giảng viên yêu cầu khi nghiệm thu.
+Topology bắt buộc: Server A/MySQL A trên máy thật A; Server B/MySQL B trên máy thật B; Client A và B trên hai VM. Hai database cùng tên schema nhưng thuộc hai MySQL local độc lập.
 
-1. Tạo schema và seed riêng trên A/B theo README; sửa IP LAN và cấu hình coordinator A.
-2. Build cùng JAR, chạy Server A trước rồi Server B. Mở client A/B bằng script trong `scripts`.
-3. Tạo sản phẩm trên A, kiểm tra B; cập nhật trên B, kiểm tra A.
-4. Nhập/xuất và xem tồn kho, lịch sử trên cả hai client; thử xuất vượt tồn.
-5. Hai client cùng sửa sản phẩm: chỉ client giữ lease được ghi.
-6. Tắt B: ghi/đăng ký ở A phải thất bại và rollback. Bật lại B, thử thao tác mới.
-7. Không trình bày rằng có hàng đợi tự hội tụ: mất phản hồi sau commit peer vẫn cần đối soát thủ công.
+## Kịch bản ngắn
 
-Demo LAN và ảnh/video chưa thực hiện. Xem [hướng dẫn chạy](README.md), [kịch bản chi tiết](docs/demo-scenarios.md) và [bằng chứng test](TESTING.md).
+Khởi động A/B, thêm sản phẩm ở A và xem ở B, nhập kho ở B và xem lịch sử ở A, sau đó tắt B để chứng minh thao tác ghi tại A thất bại và rollback.
+
+## Kịch bản đầy đủ
+
+1. Trên mỗi máy server, chạy `configure-server.ps1` với Role, LocalHost, PeerHost; chỉ dùng `-SeedDemo` cho database demo mới.
+2. Mở firewall TCP `1099–1102`; build cùng commit/build trên cả bốn node.
+3. Chạy Server A trước, Server B sau; xác nhận database, local RMI, peer và lock đều xanh.
+4. Chạy hai client bằng `run-client.ps1`, đăng nhập/đăng ký và kiểm tra thông báo tiếng Việt.
+5. Tạo sản phẩm ở A và đọc ở B; cập nhật ở B và đọc ở A.
+6. Nhập/xuất, so tồn kho và lịch sử trên hai client; thử xuất vượt tồn.
+7. Hai client cùng sửa một sản phẩm; chỉ client giữ lease được ghi. Tắt client giữ lock, chờ quá 30 giây rồi xin lại.
+8. Gửi lại cùng transaction và thử fencing token cũ; dữ liệu không được đổi lần hai.
+9. Tắt B, ghi ở A phải thất bại và rollback nguồn; bật B rồi thử thao tác mới.
+10. Giải thích rằng không có outbox/2PC: nếu peer commit nhưng mất phản hồi, phải dừng ghi và đối soát thủ công.
+
+## Phương án dự phòng
+
+- Nếu một VM lỗi, chạy hai client trên một máy nhưng vẫn giữ hai server/MySQL trên hai máy thật; nói rõ đây chỉ là phương án dự phòng client.
+- Nếu LAN chặn RMI, dùng `Test-NetConnection` cho `1099–1102`, quay lại IP LAN đúng rồi khởi động lại server để stub quảng bá đúng host.
+- Nếu MySQL local lỗi, trình bày log integration đã lưu trong `TESTING.md`; không đổi sang storage chung hoặc bỏ qua rollback.
+- Không seed lại database đang có dữ liệu. Dùng database demo mới và cùng build trên bốn node.
+
+Demo bốn máy, ảnh và video vẫn chưa có bằng chứng trong repo.

@@ -1,10 +1,11 @@
 # Xử lý lỗi Lab 5
 
-- Thiếu JAR: build trong `lap5` bằng `.\mvnw.cmd clean verify`. Script cần `target/Lap8_LTM-1.0.0-SNAPSHOT-all.jar`.
-- Thiếu properties: copy mẫu từ `src/main/resources` ra thư mục `lap5`, bỏ đuôi `.example`, sửa IP và thông tin database.
-- Database chưa có bảng: trên database mới chạy `scripts/schema.sql` rồi `scripts/demo-seed.sql`. Không seed lại database đã có dữ liệu.
-- Registry kết nối được nhưng gọi service/lock lỗi: mở cả 1099, 1100, 1101, 1102; kiểm tra IP trong stub và coordinator A.
-- Không ghi/đăng ký được khi peer tắt: hành vi chủ động của bản này; chạy cả hai server và dùng cùng JAR.
-- Dữ liệu lệch sau mất kết nối: dừng demo ghi, đối soát dữ liệu hai database; chưa có two-phase commit hoặc cơ chế tự sửa lệch.
-
-Xem phần xử lý lỗi trong [README](README.md). Docker/setup/firewall chung của Lab 1–4 chưa cấu hình Lab 5.
+- Maven/JDK: chạy `java -version` và `.\mvnw.cmd -version`; nghiệm thu bằng JDK 21, project compile release 17.
+- Thiếu cấu hình server: chạy `.\configure-server.ps1 -Role A|B -LocalHost <IP> -PeerHost <IP>`. `server.properties` bị ignore.
+- MySQL chưa sẵn sàng: kiểm tra Windows service MySQL, port local và tài khoản trong `.env`, rồi cấu hình lại. Không seed lại database có dữ liệu.
+- Registry gọi được nhưng remote object lỗi: mở đủ TCP `1099–1102`, kiểm tra `server.host` là IP LAN của đúng card mạng và dùng cùng build trên mọi node.
+- Peer/lock đỏ: chạy Server A trước; từ B kiểm tra `Test-NetConnection <IP-A> -Port 1099`.
+- Ghi thất bại khi peer tắt: đây là hành vi chủ động để nguồn rollback, không phải lỗi UI.
+- JavaFX không phản hồi: thu log console; mọi RMI/SQL đã chạy qua service nền, không gọi trực tiếp từ FX thread.
+- Dữ liệu lệch sau mất phản hồi: dừng thao tác ghi, đối soát hai MySQL; hệ thống không có 2PC hoặc tự sửa lệch.
+- Integration script lỗi ngay: kiểm tra `mysql.exe`, Windows service MySQL và `.env` root do `setup-windows.ps1` tạo.

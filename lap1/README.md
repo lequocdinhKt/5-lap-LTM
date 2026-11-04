@@ -56,7 +56,7 @@ Chi tiết từng file xem tại [`KIEN_THUC_LAP_TRINH_MANG.md`](KIEN_THUC_LAP_T
 ## Yêu cầu
 
 - Temurin JDK 21 x64; Maven biên dịch mã ở mức Java 17.
-- MySQL từ môi trường Docker chung ở root hoặc MySQL 8.4 cài trực tiếp.
+- MySQL Server 8.x cài local trên máy chạy server.
 - Maven Wrapper tự tải JavaFX và MySQL Connector/J.
 
 ## Cấu hình MySQL

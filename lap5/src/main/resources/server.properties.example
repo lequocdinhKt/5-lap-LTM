@@ -1,0 +1,12 @@
+server.id=server-a
+server.host=127.0.0.1
+rmi.registry.port=1099
+rmi.service.port=1100
+peer.server.host=127.0.0.1
+peer.rmi.port=1099
+lock.coordinator.host=127.0.0.1
+lock.coordinator.port=1099
+db.url=jdbc:mysql://127.0.0.1:3306/lab5_warehouse?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh
+db.username=root
+db.password=replace-me
+lock.lease.seconds=30

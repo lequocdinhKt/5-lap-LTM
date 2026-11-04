@@ -20,7 +20,7 @@
 
 ## Database lỗi
 
-Chạy Docker MySQL và kiểm tra `db.properties`/`LTM_DB_*`. Database ứng dụng không thay thế mailbox SMTP/POP3; hai nơi lưu dữ liệu có mục đích khác nhau.
+Kiểm tra Windows service MySQL local và `db.properties`/`LTM_DB_*`. Database ứng dụng không thay thế mailbox SMTP/POP3; hai nơi lưu dữ liệu có mục đích khác nhau.
 
 ## UI treo hoặc không cập nhật
 

@@ -7,7 +7,8 @@ $rules = @(
     @{ Name = "LTM Lab2 FTP Control"; Protocol = "TCP"; Ports = "2121" },
     @{ Name = "LTM Lab2 FTP Passive"; Protocol = "TCP"; Ports = "30000-30020" },
     @{ Name = "LTM Lab3 SMTP POP3"; Protocol = "TCP"; Ports = "3025,3110" },
-    @{ Name = "LTM Lab4 HTTP"; Protocol = "TCP"; Ports = "8080" }
+    @{ Name = "LTM Lab4 HTTP"; Protocol = "TCP"; Ports = "8080" },
+    @{ Name = "LTM Lab5 RMI"; Protocol = "TCP"; Ports = "1099-1102" }
 )
 
 foreach ($rule in $rules) {

@@ -1,22 +1,29 @@
 # Kiểm thử Lab 5
 
-## Bằng chứng ngày 03/11/2026
+## Tự động
 
-- Biên dịch trực tiếp bằng JDK 17 và chạy JUnit Platform: 49/49 test thành công.
-- MariaDB 10.4.32: 43 kiểm tra database/RMI thành công với hai database tạm trên cùng máy. Đã thử schema mới và bản sao cấu trúc database đang dùng.
-- Bao gồm đăng nhập, đăng ký đồng bộ UUID, CRUD, lock cạnh tranh, nhập/xuất hai chiều, giao dịch trùng, rollback khi peer offline và từ chối xuất quá tồn kho.
-- `scripts/schema.sql` đã tạo bảng và chạy seed thành công; các database thử đã được xóa, dữ liệu lab gốc giữ nguyên.
-- Test JDBC/RMI bổ sung dùng harness tạm trong môi trường kiểm tra; harness này không đóng gói trong repo. Unit test nằm trong `src/test/java`.
+Chạy tại `lap5`:
 
-- Bản nhập trong repo đích đã chạy Maven `clean verify` bằng JDK 21 thành công: 49 test, đóng gói đủ JAR thường và JAR `-all`.
+```powershell
+.\mvnw.cmd clean verify
+```
 
-## Chạy lại
+Kết quả gần nhất ngày 04/11/2026 bằng Microsoft OpenJDK 21.0.12.1: Maven thành công, 52 test được phát hiện, 51 chạy thành công và 1 integration test được skip theo mặc định. Các test bao phủ rule tồn kho/lock, RMI adapter, đăng nhập/đăng ký, CRUD, rollback nguồn, transaction trùng, cấu hình ưu tiên, client service bất đồng bộ, vòng đời server, cấu trúc JavaFX và timeline.
 
-Trong `lap5`, chạy `.\mvnw.cmd clean verify` với JDK 21 hoặc `mvn clean verify` với JDK 17 trở lên. Lần đầu cần Internet để tải Maven/dependency.
+Integration test thật cần MySQL Server local đang chạy và `mysql.exe` khả dụng:
 
-## Còn chờ nghiệm thu
+```powershell
+.\run-integration-tests.ps1
+```
 
-- Hai máy thật và hai VM: IP quảng bá trong stub, firewall 1099–1102, độ trễ và mất kết nối LAN.
-- Ảnh/video UI, demo giảng viên và đối chiếu toàn bộ REQUIREMENTS/DEFINITION_OF_DONE.
-- Chưa khẳng định đạt JavaFX/Docker theo chuẩn chung; bản hiện tại dùng Swing/MariaDB.
-- Không có bảo đảm commit nguyên tử trên hai database; xem PROTOCOL.md.
+Script tạo hai schema tạm `lab5_test_a`, `lab5_test_b` trên MySQL local, chạy hai server bằng port `1199/1200–1202` và `1299/1300–1302`, kiểm tra đồng bộ/rollback rồi xóa đúng hai schema tạm.
+
+Kết quả ngày 04/11/2026 bằng Microsoft OpenJDK 21.0.12.1 trên dịch vụ MySQL80 local: integration test thành công. Đã kiểm tra đăng ký/login qua peer, CRUD A→B và B→A, nhập kho/lịch sử, transaction trùng, tranh lock, lease hết hạn, fencing token cũ, dữ liệu không hợp lệ, port bận, database lỗi và rollback nguồn khi peer offline. Script kết thúc với mã `0` và xóa hai schema tạm.
+
+Smoke JavaFX ngày 04/11/2026: `run-client.ps1` và `run-server.ps1` đều mở được cửa sổ; stylesheet được nạp không còn CSS parse error. Hai tiến trình được đóng ngay sau kiểm tra, chưa thay thế cho ảnh/video demo bốn máy.
+
+## Cổng kiểm thử còn thiếu
+
+- Demo LAN trên hai máy thật và hai VM, kèm ảnh/video.
+
+Không đánh dấu Lab 5 hoàn thành trước khi các mục trên và `DEFINITION_OF_DONE.md` đều có bằng chứng.

@@ -1,9 +1,9 @@
-# Kiến trúc
+# Kiến trúc chi tiết
 
-Server A là lock coordinator duy nhất. Mỗi server có MariaDB riêng, nhận yêu cầu từ client qua RMI và gọi `SyncService` của peer trực tiếp trong thao tác ghi. Máy gọi chỉ commit cục bộ sau khi peer phản hồi thành công.
+Server A là lock coordinator duy nhất. Mỗi server có MySQL Server 8.x local riêng, nhận yêu cầu từ client qua `WarehouseService` và gọi `SyncService` peer trực tiếp trong thao tác ghi. Server nguồn chỉ commit sau khi peer xác nhận.
 
-Lease lock có `lock_token` và `fencing_token`. Khi coordinator không truy cập được, server không tự cấp lock mới.
+`WarehouseClientService` tạo executor cho RMI và scheduler heartbeat. `ServerRuntimeService` sở hữu connection pool, registry, remote object và status snapshot. JavaFX view không lookup registry, gọi JDBC hay giữ scheduler.
 
-Server A lưu lease trong `product_locks`; mỗi lần cấp khóa, nó tăng `products.last_fencing_token` trong transaction và khóa dòng sản phẩm bằng `FOR UPDATE`. Vì vậy token của cùng một sản phẩm không bị tái sử dụng sau khi Server A khởi động lại. Client giữ khóa gia hạn bằng heartbeat; token hết hạn hoặc bị thay thế không hợp lệ.
+`WarehouseServiceImpl` điều phối transaction nguồn qua `UserRepository`, `ProductRepository` và `InventoryRepository`. `SyncServiceImpl` là RMI adapter, ủy quyền SQL nhận peer cho `PeerSyncRepository`. `LockManager` ủy quyền lưu lease/fencing cho `LockRepository`.
 
-Direct RMI Sync gọi `SyncService` của peer ngay trong thao tác ghi. Peer áp dụng snapshot bằng upsert/điều kiện version và ghi giao dịch bằng khóa chính `inventory_transactions.id`, nên cùng một giao dịch không tạo lịch sử trùng. Đây là đồng bộ trực tiếp, không có outbox retry và không có transaction coordinator; nếu peer commit trước rồi máy gọi lỗi trước local commit, cần phát hiện/đối soát thủ công trong phạm vi demo.
+Đồng bộ trực tiếp bảo vệ rollback nguồn khi peer offline nhưng không tạo commit nguyên tử xuyên hai database. Trạng thái peer đã commit rồi mất phản hồi phải được đối soát thủ công.

@@ -16,6 +16,8 @@ Chạy server trước, sau đó:
 
 Test đăng nhập, upload, LIST, download, so sánh byte và xóa file.
 
+Kết quả ngày 04/11/2026 trên dịch vụ MySQL80 local: server khởi động tại `2121`; integration test đăng nhập `alice`, STOR, LIST, RETR, so sánh byte và DELE thành công. Server được dừng sau test.
+
 ## Ma trận test bổ sung
 
 - Sai user/password; lệnh cần auth trước khi login.

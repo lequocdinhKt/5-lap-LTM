@@ -1,6 +1,9 @@
--- Run manually on each EMPTY database before demo-seed.sql.
--- Select warehouse_a or warehouse_b in your SQL client first.
--- This script does not modify existing tables; it is not a migration.
+-- Chạy trên MySQL Server local độc lập của Máy A và Máy B.
+-- Script chỉ tạo schema mới, không phải migration dữ liệu MariaDB cũ.
+CREATE DATABASE IF NOT EXISTS lab5_warehouse
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE lab5_warehouse;
+
 CREATE TABLE IF NOT EXISTS users (
     id CHAR(36) PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,

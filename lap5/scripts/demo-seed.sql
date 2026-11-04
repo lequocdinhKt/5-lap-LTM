@@ -1,4 +1,5 @@
--- REVIEW BEFORE RUNNING. Execute manually in HeidiSQL on each independent lap8_ltm database.
+-- Chỉ chạy khi chuẩn bị dữ liệu demo mới trên từng database độc lập.
+USE lab5_warehouse;
 -- Intended for empty users/products tables. Do not run on a populated database.
 -- Review the users schema first; this sample expects a plain-text password column.
 -- Demo passwords are visible in this file and are suitable only for this lab.

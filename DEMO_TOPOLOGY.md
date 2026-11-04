@@ -6,7 +6,7 @@
 flowchart LR
     subgraph A[Máy A — Windows]
         SA[Server]
-        DA[(MySQL Docker)]
+        DA[(MySQL local)]
         CA1[Client 1]
         CA2[Client 2]
         SA --- DA
@@ -47,7 +47,8 @@ flowchart LR
     VM2 -. kiểm tra dữ liệu .-> A
 ```
 
-Port registry, remote object và chính sách xung đột sẽ chốt sau khi code Lab 5 được push.
+Mỗi máy thật chạy một MySQL Server local với data directory riêng. Registry dùng `1099`, Warehouse
+`1100`, Sync `1101` và Lock `1102`; không mở MySQL ra LAN.
 
 ## Checklist trước demo
 

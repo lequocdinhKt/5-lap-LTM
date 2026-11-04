@@ -1,7 +1,10 @@
 # Quy tắc Lab 5 — RMI
 
-- Hiện tại chỉ duy trì tài liệu; không tạo code, `pom.xml` hoặc cấu hình triển khai khi chưa có yêu cầu.
-- Mục tiêu sau này: hai server trên hai máy thật, hai client trên hai máy ảo và đồng bộ dữ liệu qua Java RMI.
-- Thiết kế phải giải thích registry, remote interface, serialization, lỗi mạng và chiến lược xung đột.
-- Server A và Server B không dùng chung ổ đĩa hoặc database để giả lập đồng bộ.
-- Mọi quyết định từ code được bạn cùng nhóm push lên phải được phản ánh lại trong tài liệu trước khi demo.
+- Lab 5 là Maven project độc lập, chạy trên Windows bằng JDK 21 và Maven Wrapper; mức bytecode là Java 17.
+- Giữ package gốc `lab5.*`, JavaFX 21, MySQL Server 8.x local và đồng bộ trực tiếp hai chiều qua Java RMI.
+- UI chỉ gọi lớp trong `lab5.service`; SQL chỉ nằm trong `lab5.db`; RMI adapter không chứa JavaFX type.
+- Server A và Server B dùng hai MySQL local với data directory độc lập, không dùng storage chung để giả lập đồng bộ.
+- Giữ lock lease 30 giây, heartbeat 10 giây, fencing token, idempotency và rollback nguồn khi peer lỗi.
+- Cấu hình ưu tiên: tham số dòng lệnh, biến môi trường `LAB5_*`, properties cục bộ, rồi default local.
+- Không commit `server.properties`, mật khẩu, IP cá nhân hoặc dữ liệu database thật.
+- Mỗi thay đổi chức năng phải cập nhật Feature Map, protocol, kiểm thử hoặc demo liên quan.

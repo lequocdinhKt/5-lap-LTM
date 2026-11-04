@@ -2,11 +2,11 @@
 
 - [x] ✅ **03/11/2026:** Đã nhập mã nguồn kho RMI vào `lap5`; chỉ cập nhật Lab 5 và tài liệu trạng thái chung. Không thay đổi Lab 1–4. Đã có bằng chứng 49 unit test và 43 kiểm tra MariaDB/RMI trên máy A; Maven clean verify với JDK 21 đã thành công (49 test); chưa nghiệm thu LAN.
 
-Cập nhật gần nhất: **02/11/2026**
+Cập nhật gần nhất: **04/11/2026**
 
-Baseline đã kiểm tra: commit `7265f1e` (nhánh `main`)
+Baseline Lab 5 đã khóa: commit `b30d3ee` (`origin/main`), triển khai trên nhánh `codex/lab5-standardize`.
 
-Trạng thái hiện tại: **Giai đoạn 4 đã xong; Lab 1–4 build sạch, `ChatIntegrationTest` Lab 1 đạt trên MySQL Docker, còn chờ demo hai máy, ảnh và video**.
+Trạng thái hiện tại: **Lab 1–5 build sạch bằng JDK 21; Lab 1, Lab 2 và Lab 5 đã chạy integration trên MySQL local; Lab 5 smoke JavaFX đạt, chỉ còn demo nhiều máy và bằng chứng ảnh/video**.
 
 ## Cách đọc trạng thái
 
@@ -20,25 +20,25 @@ Trạng thái hiện tại: **Giai đoạn 4 đã xong; Lab 1–4 build sạch, 
 
 ## Tổng quan theo giai đoạn
 
-- [x] ✅ Giai đoạn 1 — Chuẩn hóa môi trường Windows, JDK, Maven Wrapper, Docker MySQL và firewall.
+- [x] ✅ Giai đoạn 1 — Chuẩn hóa môi trường Windows, JDK, Maven Wrapper, MySQL local và firewall.
 - [x] ✅ Giai đoạn 2 — Tạo project harness, tài liệu chung, tài liệu từng lab và `AGENTS.md`.
 - [x] ✅ Giai đoạn 3 — Chuẩn hóa Maven layout/package cho Lab 1–4.
 - [x] ✅ Giai đoạn 4 — Áp dụng design system JavaFX cho cả Lab 1–4; cả bốn lab build sạch.
 - [ ] ⏸️ Giai đoạn 5 — Test tự động Lab 1–4 đã xong; demo hai máy, ảnh, video và hồ sơ bảo vệ đang chờ Máy A/B và người thực hiện.
-- [ ] ⏸️ Giai đoạn 6 — Đã nhập mã Lab 5 và build/test local; còn demo LAN và chuẩn hóa JavaFX/Docker.
+- [ ] ⏸️ Giai đoạn 6 — Đã chuẩn hóa, test JDK 21, integration MySQL local và smoke JavaFX Lab 5; chờ demo hai máy thật/hai VM.
 
 ## Việc đang làm
 
-Hiện **không có task code đang chạy**. Giai đoạn 4 đã hoàn tất: Lab 1/3 có thêm sidebar, toast, skeleton và animation; script mở nhiều client đã có và đã chạy thử; 16 script `.ps1` được lưu UTF-8 có BOM để Windows PowerShell 5.1 đọc đúng tiếng Việt. Hệ thống đã chuyển sang MySQL 8.4.13 chạy Docker (`ltm-mysql`, `127.0.0.1:3307`) và `ChatIntegrationTest` của Lab 1 đã đạt.
+Hiện **không có task code đang chạy**. Lab 5 đã chuyển sang JavaFX, package `lab5.*`, MySQL Connector/J, repository/transaction manager, service bất đồng bộ và script PowerShell. `verify-all.ps1` đã build Lab 1–5 và chạy integration Lab 3/4 thành công trên JDK 25; riêng Lab 5 có 52 test, 51 đạt và 1 integration test bị skip theo cờ môi trường.
 
-Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.md`, chạy demo hai máy, sau đó chụp ảnh và quay video bảo vệ.
+Bước tiếp theo: dựng topology bốn máy theo `DEMO_TOPOLOGY.md`, chụp ảnh và quay video bảo vệ.
 
 ## Hạ tầng và tài liệu chung
 
-- [x] ✅ JDK 21 và Maven Wrapper độc lập cho Lab 1–4.
-- [x] ✅ Docker Compose MySQL và script `setup-windows.ps1`.
+- [x] ✅ Maven Wrapper độc lập cho Lab 1–5; cấu hình mục tiêu JDK 21.
+- [x] ✅ MySQL Server local và script `setup-windows.ps1` tự tìm `mysql.exe`, kiểm tra kết nối, sinh cấu hình cục bộ.
 - [x] ✅ Script build chung `verify-all.ps1`.
-- [x] ✅ Script firewall cho toàn bộ port Lab 1–4.
+- [x] ✅ Script firewall cho toàn bộ port Lab 1–5, gồm RMI TCP 1099–1102.
 - [x] ✅ Xóa nested Git/gitlink và file build/config cục bộ khỏi Git.
 - [x] ✅ Sáu tài liệu chung ở root.
 - [x] ✅ Tám tài liệu bắt buộc cho từng Lab 1–5.
@@ -48,8 +48,8 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 - [x] ✅ Chuẩn hóa namespace `lab1.*`–`lab4.*` và package theo vai trò với số package tối thiểu.
 - [x] ✅ Script mở tự động nhiều client: `lap1/run-demo-clients.ps1` (1–6 client, `-AutoConnect`) và `lap3/run-demo-clients.ps1` (1–4 client).
 - [x] ✅ Lưu toàn bộ `.ps1` dạng UTF-8 có BOM; sửa lỗi parse của `setup-windows.ps1` và `configure-firewall.ps1` trên Windows PowerShell 5.1.
-- [x] ✅ `setup-windows.ps1` chạy được trên Windows PowerShell 5.1: sửa `NativeCommandError` khi gọi `java -version` và `docker compose up -d`.
-- [x] ✅ MySQL 8.4.13 chạy Docker (`ltm-mysql`, `127.0.0.1:3307`) vì cổng `3306` đã bị MySQL80 cài trực tiếp chiếm; `db.properties` của Lab 1–3 được sinh lại với `user=root`.
+- [x] ✅ `setup-windows.ps1` chạy được trên Windows PowerShell 5.1, đọc mật khẩu kín và không đưa secret lên argv.
+- [x] ✅ MySQL80 local chạy tại `127.0.0.1:3306`; `db.properties` của Lab 1–3 được sinh lại với cấu hình bị ignore.
 
 ## Lab 1 — Chat TCP/UDP
 
@@ -60,7 +60,7 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 - [x] ✅ UI client/server đang dùng JavaFX.
 - [x] ✅ Có `ChatIntegrationTest` và bot demo.
 - [x] ✅ Chuẩn hóa Maven layout/package; integration test 6 client vượt qua.
-- [x] ✅ Chạy lại `ChatIntegrationTest` ngày 02/11/2026 trên MySQL Docker: 13 dòng `[PASS]` và kết thúc bằng `TẤT CẢ KIỂM THỬ TÍCH HỢP ĐÃ THÀNH CÔNG.`
+- [x] ✅ Chạy lại `ChatIntegrationTest` ngày 04/11/2026 trên MySQL80 local: 13 dòng `[PASS]` và kết thúc bằng `TẤT CẢ KIỂM THỬ TÍCH HỢP ĐÃ THÀNH CÔNG.`
 - [x] ✅ Design system: sidebar/topbar, status badge, toast, fade animation và layout co giãn (danh sách online đẩy realtime nên không cần skeleton).
 - [x] ✅ Script chạy 5–6 client: `run-demo-clients.ps1 -ClientCount 6`, `-ServerHost` trỏ IP Máy A, `-AutoConnect` tự đăng nhập tài khoản demo.
 - [ ] ⏸️ Demo thực tế hai máy — cần hai máy cùng LAN để xác nhận multicast/broadcast/firewall.
@@ -107,10 +107,15 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 
 ## Lab 5 — RMI
 
-- [x] ✅ Đã có README, requirements, architecture, feature map khung, protocol, demo, testing và troubleshooting.
-- [x] ✅ Đã nhập mã nguồn, Maven Wrapper, remote interface và schema MariaDB vào lap5; Maven clean verify JDK 21 đạt 49 test.
-- [x] ✅ Đã ghi contract RMI, port 1099–1102, đồng bộ hai chiều và giới hạn commit vào lap5/PROTOCOL.md.
-- [ ] 🚫 Test/demo bốn máy — cần hai máy thật, hai máy ảo và code hoàn chỉnh.
+- [x] ✅ Maven `com.ltm:lab5-rmi`, package `lab5.*`, JavaFX 21 và MySQL Connector/J; bỏ Swing/MariaDB/Jackson/outbox cũ.
+- [x] ✅ UI gọi service; SQL nằm trong repository; transaction nguồn qua `TransactionManager`; RMI adapter giữ contract nghiệp vụ.
+- [x] ✅ Giữ đồng bộ trực tiếp hai chiều, rollback nguồn, lease 30 giây, heartbeat 10 giây, fencing và idempotency.
+- [x] ✅ Có script cấu hình/chạy/integration, schema/seed mới, firewall 1099–1102 và tài liệu tiếng Việt đồng bộ.
+- [x] ✅ `mvnw.cmd clean verify`: 52 test, 51 đạt, 1 integration test skip; `verify-all.ps1` Lab 1–5 đạt trên JDK 25.
+- [x] ✅ Integration MySQL local bằng JDK 21 — hai schema tạm, hai RMI server và toàn bộ ma trận chính đã đạt; script trả mã `0` và schema tạm được xóa.
+- [x] ✅ Kiểm chứng JDK 21 — `verify-all.ps1` đạt bằng Microsoft OpenJDK 21.0.12.1.
+- [x] ✅ Smoke JavaFX client/server — hai cửa sổ mở thành công, không còn CSS parse error.
+- [ ] ⏸️ Demo bốn máy — cần hai máy thật, hai VM, ảnh và video.
 
 ## Vì sao công việc đang dừng
 
@@ -120,13 +125,21 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 | Design system Lab 1–4 | Hoàn thành | Lab 1/3 đã thêm sidebar, toast, skeleton, animation; Lab 2/4 đã có progress/toast | Kiểm tra trực quan trên nhiều độ phân giải |
 | Script nhiều client | Hoàn thành | `run-demo-clients.ps1` ở Lab 1/3 đã chạy thử trên một máy | Truyền `-ServerHost` là IPv4 Máy A khi demo hai máy |
 | Script `.ps1` trên PowerShell 5.1 | Hoàn thành | 4 script lỗi parse vì thiếu UTF-8 BOM; đã thêm BOM cho cả 16 script | Giữ BOM khi tạo/sửa script trên Windows |
-| MySQL cho Lab 1–3 | Hoàn thành | Đã chuyển sang MySQL 8.4.13 chạy Docker (container `ltm-mysql`, `127.0.0.1:3307`) và `setup-windows.ps1` sinh lại `db.properties` với `user=root` | Chạy `docker compose up -d` trước khi demo; mỗi máy giữ `.env` cục bộ riêng |
+| MySQL cho Lab 1–3 | Hoàn thành | MySQL80 local `127.0.0.1:3306`; `setup-windows.ps1` kiểm tra kết nối và sinh `db.properties` | Giữ Windows service MySQL chạy; mỗi máy giữ `.env` cục bộ riêng |
 | Demo hai máy | Tạm dừng | Phiên hiện tại chỉ kiểm tra được trên một máy | Có Máy A/B cùng LAN và quyền firewall |
 | Gmail thật | Tạm dừng | Không lưu App Password trong repo | Người dùng nhập tài khoản demo khi kiểm tra |
 | Ảnh/video | Tạm dừng | UI cuối đã xong nhưng cần thao tác trên giao diện thật | Chụp/quay sau khi demo hai máy chạy được |
-| Lab 5 | Tạm dừng nghiệm thu | Code và build local đã có; chưa demo LAN hoặc chuẩn hóa JavaFX/Docker | Xem lap5/TESTING.md và chạy hai máy thật |
+| Lab 5 | Tạm dừng nghiệm thu | Code/tài liệu, JDK 21, integration MySQL local và smoke UI đã đạt; chưa có topology bốn máy/ảnh/video | Demo hai máy thật/hai VM và lưu bằng chứng |
 
 ## Lịch sử cập nhật
+
+- **04/11/2026:** Bắt đầu chuẩn hóa Lab 5 từ commit `b30d3ee`: giữ nghiệp vụ RMI/lock hiện có, chuyển sang JavaFX, kiến trúc phân lớp, MySQL local và harness chung.
+- **04/11/2026:** Hoàn tất phần triển khai local Lab 5: JavaFX client/server, package `lab5.*`, repository/transaction manager, cấu hình/script Windows và 52 test. Integration hai RMI server trên MySQL local đạt; chuyển Giai đoạn 6 sang tạm dừng vì JDK 21/UI/demo bốn máy chưa có.
+- **04/11/2026:** Theo yêu cầu mới, xóa cấu hình và tài liệu phụ thuộc hạ tầng database ảo hóa; `setup-windows.ps1`, Lab 1–3 và integration Lab 5 chuyển hoàn toàn sang dịch vụ MySQL local/`mysql.exe`.
+- **04/11/2026:** Kiểm chứng MySQL local: `ChatIntegrationTest` Lab 1, `FtpIntegrationTest` Lab 2 và `run-integration-tests.ps1` Lab 5 đều thành công; `verify-all.ps1` Lab 1–5 đạt.
+- **04/11/2026:** Loại bỏ Swing/AWT còn sót trong Lab 5, sửa CSS font-weight, mở smoke hai JavaFX window thành công và chuyển thao tác đóng RMI/database ra background service.
+- **04/11/2026:** Tìm thấy Microsoft OpenJDK 21.0.12.1 cục bộ; chạy `verify-all.ps1` bằng đúng JDK 21, cả Lab 1–5 cùng integration Lab 3/4 đều đạt.
+- **04/11/2026:** Chạy lại `lap5/run-integration-tests.ps1` bằng Microsoft OpenJDK 21.0.12.1 trên MySQL80 local; toàn bộ ma trận hai RMI server đạt, script trả mã `0` và dọn hai schema tạm.
 
 - **02/11/2026:** Tạo `PROGRESS.md`; ghi nhận môi trường và project harness đã hoàn thành, các giai đoạn code/UI/demo chưa bắt đầu.
 - **02/11/2026:** Bắt đầu Giai đoạn 3 — chuẩn hóa Maven layout/package cho Lab 1–4, sau đó JavaFX hóa Lab 2 và Lab 4.
@@ -137,7 +150,7 @@ Bước tiếp theo khi có điều kiện: dựng Máy A/B theo `DEMO_TOPOLOGY.
 - **02/11/2026:** Phát hiện script `.ps1` lỗi parse trên Windows PowerShell 5.1 do thiếu UTF-8 BOM; đã thêm BOM cho 16 script (gồm `setup-windows.ps1`, `configure-firewall.ps1`) và parse lại toàn bộ đạt.
 - **02/11/2026:** Chuyển Lab 4 sang stream file tĩnh; chạy `mvnw clean verify` cho Lab 1–4, `LocalMailIntegrationTest` (lab3) và `HttpIntegrationTest` (lab4) đều đạt.
 - **02/11/2026:** Chẩn đoán `ChatIntegrationTest` Lab 1: MySQL80 đang chạy (port 3306 mở) nhưng `lap1/db.properties` dùng `db.user=lap1` và bị `Access denied`; `.env` ở root không tồn tại. Đã ghi nhận vào bảng “Vì sao công việc đang dừng” và sửa lại phần bằng chứng trong `lap1/TESTING.md`.
-- **02/11/2026:** Sửa `setup-windows.ps1` để chạy được trên Windows PowerShell 5.1 (NativeCommandError từ `java -version` và `docker compose up -d`), chuyển MySQL sang Docker ở cổng `3307` vì `3306` bị MySQL80 chiếm; cập nhật `README.md` và `.env.example`.
-- **02/11/2026:** `ChatIntegrationTest` Lab 1 đạt 13/13 `[PASS]` trên MySQL Docker; cập nhật lại bằng chứng trong `lap1/TESTING.md` và trạng thái MySQL trong `PROGRESS.md` từ “Bị chặn” sang “Hoàn thành”.
+- **02/11/2026:** Sửa `setup-windows.ps1` để chạy được trên Windows PowerShell 5.1 và cập nhật `README.md`, `.env.example`.
+- **04/11/2026:** `ChatIntegrationTest` Lab 1 đạt 13/13 `[PASS]` trên MySQL80 local; bỏ hạ tầng database ảo hóa và chuẩn hóa toàn repo dùng MySQL cài trực tiếp.
 
-- **03/11/2026:** Nhập mã kho RMI từ Lap8_LTM vào lap5, cập nhật tài liệu lab và thêm Maven Wrapper; giữ nguyên Lab 1–4. Bằng chứng local: 49 unit test, 43 kiểm tra MariaDB/RMI. Chưa nghiệm thu LAN/JavaFX/Docker; xem lap5/TESTING.md.
+- **03/11/2026:** Nhập mã kho RMI từ Lap8_LTM vào lap5, cập nhật tài liệu lab và thêm Maven Wrapper; giữ nguyên Lab 1–4. Bằng chứng local: 49 unit test, 43 kiểm tra MariaDB/RMI. Chưa nghiệm thu LAN/JavaFX; xem lap5/TESTING.md.

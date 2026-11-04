@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.warehouse</groupId>
-    <artifactId>Lap8_LTM</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <groupId>com.ltm</groupId>
+    <artifactId>lab5-rmi</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -13,13 +13,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.2</junit.version>
         <slf4j.version>2.0.13</slf4j.version>
+        <javafx.version>21.0.2</javafx.version>
+        <mysql.version>9.5.0</mysql.version>
+        <app.mainClass>lab5.client.ClientLauncher</app.mainClass>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>3.4.1</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.version}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -27,9 +30,9 @@
             <version>5.1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.18.3</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -55,7 +58,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>*.properties.example</include>
+                    <include>**/*</include>
                 </includes>
             </resource>
         </resources>
@@ -74,13 +77,26 @@
                 <version>3.5.5</version>
             </plugin>
             <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>${app.mainClass}</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.warehouse.server.ServerLauncher</mainClass>
+                            <mainClass>lab5.server.ServerLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
