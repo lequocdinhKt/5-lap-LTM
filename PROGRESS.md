@@ -27,6 +27,7 @@ Trạng thái hiện tại: **Lab 1–5 build sạch bằng JDK 21; Lab 1, Lab 2
 
 ## Việc đang làm
 
+- [x] ✅ Đã đồng bộ thư mục chính `5lap` với `origin/main`, gỡ worktree Lab 5 tạm và chạy `verify-all.ps1`; cả năm Maven project build thành công trước khi bàn giao cho thành viên pull.
 - [x] ✅ Đã refactor tối giản Lab 1, 2 và 4 theo luồng `UI → service → network/db`; thêm `ChatService`, `FtpService`, `BrowserService`, giữ nguyên giao thức, cổng và giao diện. Cả ba lab `clean verify` thành công; ba integration test chạy qua service mới đều đạt.
 
 Bước tiếp theo: demo hai máy và kiểm tra trực quan đầy đủ các thao tác UI; riêng Lab 4 có cảnh báo CSS `-fx-font-weight` cũ cần xử lý trong một task giao diện riêng nếu muốn log sạch.
@@ -131,6 +132,8 @@ Bước tiếp theo: demo hai máy và kiểm tra trực quan đầy đủ các 
 
 ## Lịch sử cập nhật
 
+- **06/11/2026:** Bắt đầu hợp nhất về một thư mục làm việc `5lap`; đã sao lưu trạng thái local cũ bằng nhánh backup và stash trước khi đồng bộ với `origin/main`.
+- **06/11/2026:** Hoàn thành hợp nhất về `5lap`, gỡ worktree `5lap-lab5-standardize`, lưu bản Lab 5 độc lập cũ thành ZIP và chạy `verify-all.ps1` thành công cho Lab 1–5.
 - **04/11/2026:** Bắt đầu chuẩn hóa Lab 5 từ commit `b30d3ee`: giữ nghiệp vụ RMI/lock hiện có, chuyển sang JavaFX, kiến trúc phân lớp, MySQL local và harness chung.
 - **04/11/2026:** Hoàn tất phần triển khai local Lab 5: JavaFX client/server, package `lab5.*`, repository/transaction manager, cấu hình/script Windows và 52 test. Integration hai RMI server trên MySQL local đạt; chuyển Giai đoạn 6 sang tạm dừng vì JDK 21/UI/demo bốn máy chưa có.
 - **04/11/2026:** Theo yêu cầu mới, xóa cấu hình và tài liệu phụ thuộc hạ tầng database ảo hóa; `setup-windows.ps1`, Lab 1–3 và integration Lab 5 chuyển hoàn toàn sang dịch vụ MySQL local/`mysql.exe`.
