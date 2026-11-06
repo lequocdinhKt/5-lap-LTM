@@ -14,7 +14,7 @@ Khởi động A/B, thêm sản phẩm ở A và xem ở B, nhập kho ở B và
 4. Chạy hai client bằng `run-client.ps1`, đăng nhập/đăng ký và kiểm tra thông báo tiếng Việt.
 5. Tạo sản phẩm ở A và đọc ở B; cập nhật ở B và đọc ở A.
 6. Nhập/xuất, so tồn kho và lịch sử trên hai client; thử xuất vượt tồn.
-7. Hai client cùng sửa một sản phẩm; chỉ client giữ lease được ghi. Tắt client giữ lock, chờ quá 30 giây rồi xin lại.
+7. Hai client cùng thao tác một sản phẩm; client xin được lease mới được mở giao diện Sửa/Nhập kho/Xuất kho. Client còn lại nhận thông báo khóa và không mở dialog. Tắt client giữ lock, chờ quá 30 giây rồi xin lại.
 8. Gửi lại cùng transaction và thử fencing token cũ; dữ liệu không được đổi lần hai.
 9. Tắt B, ghi ở A phải thất bại và rollback nguồn; bật B rồi thử thao tác mới.
 10. Giải thích rằng không có outbox/2PC: nếu peer commit nhưng mất phản hồi, phải dừng ghi và đối soát thủ công.

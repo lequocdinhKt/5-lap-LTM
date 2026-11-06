@@ -271,9 +271,11 @@ public final class ClientView implements AutoCloseable {
         if (product == null) return;
         state.setText("Đang xin quyền thao tác...");
         service.acquireLease(product.id()).whenComplete((lease, error) -> Platform.runLater(() -> {
-            if (error != null) {
+            if (error != null || lease == null) {
                 state.setText("Không lấy được quyền thao tác.");
-                showToast(message(error), true);
+                showToast(error == null
+                        ? "Không thể mở giao diện thao tác vì sản phẩm đang bị khóa."
+                        : message(error), true);
             } else {
                 state.setText("Đã giữ quyền thao tác.");
                 action.accept(product);

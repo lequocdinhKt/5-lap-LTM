@@ -27,6 +27,9 @@ Trạng thái hiện tại: **Lab 1–5 build sạch bằng JDK 21; Lab 1, Lab 2
 
 ## Việc đang làm
 
+- [x] ✅ Sửa nhận diện client và luồng lock Lab 5 để hai client khác nhau không thể cùng giữ quyền sửa/nhập/xuất trên một sản phẩm; test lock/client và build đã đạt.
+- [x] ✅ UI Lab 5 chỉ mở dialog Sửa/Nhập kho/Xuất kho sau khi lấy lock thành công; client khác nhận thông báo và không mở giao diện thao tác.
+- [x] ✅ Sửa câu SQL upsert lock của Lab 5 để tương thích MariaDB 10.4 và MySQL 8; test lock và build Lab 5 đã đạt.
 - [x] ✅ Đã đồng bộ thư mục chính `5lap` với `origin/main`, gỡ worktree Lab 5 tạm và chạy `verify-all.ps1`; cả năm Maven project build thành công trước khi bàn giao cho thành viên pull.
 - [x] ✅ Đã refactor tối giản Lab 1, 2 và 4 theo luồng `UI → service → network/db`; thêm `ChatService`, `FtpService`, `BrowserService`, giữ nguyên giao thức, cổng và giao diện. Cả ba lab `clean verify` thành công; ba integration test chạy qua service mới đều đạt.
 
@@ -145,6 +148,11 @@ Bước tiếp theo: demo hai máy và kiểm tra trực quan đầy đủ các 
 - **06/11/2026:** Hoàn thành refactor `ChatService`, `FtpService`, `BrowserService`; UI không còn gọi trực tiếp lớp network. `clean verify` của Lab 1/2/4 thành công; `ChatIntegrationTest`, `FtpIntegrationTest`, `HttpIntegrationTest` đều đạt qua service mới; ba client JavaFX khởi động được.
 - **06/11/2026:** Bắt đầu rà soát cách chạy 5 lab trên VirtualBox/Tiny10; ưu tiên xác định topology đúng theo yêu cầu Lab 5 và không sửa mã nguồn.
 - **06/11/2026:** Hoàn thành rà soát tài liệu chạy, cổng và cấu hình; kết luận Lab 1–4 có thể dùng máy thật làm server và VM làm client, còn Lab 5 khi nghiệm thu phải dùng hai server trên hai máy thật và hai client trên hai VM.
+- **06/11/2026:** Phát hiện Lab 5 kết nối được database/RMI nhưng thao tác lock lỗi trên MariaDB 10.4 do cú pháp alias `VALUES (...) AS incoming`; đang thay bằng cú pháp `VALUES(column)` tương thích MariaDB và MySQL.
+- **06/11/2026:** Sửa `lap5/src/main/java/lab5/db/LockRepository.java` dùng `VALUES(column)` cho upsert lock; `LockRulesTest`, `LockExportTest` và build package Lab 5 đều đạt.
+- **06/11/2026:** Bắt đầu điều tra phản ánh hai client vẫn cùng thao tác một sản phẩm; cần bảo đảm mỗi tiến trình client có client ID thực sự duy nhất và kiểm tra lock ở server cho cả sửa, nhập kho, xuất kho.
+- **06/11/2026:** ClientLauncher tạo runtime client ID duy nhất theo ID cấu hình, tên máy và UUID ngắn; lock server tiếp tục kiểm tra token/fencing/client ID cho sửa, xóa, nhập kho và xuất kho. Các test lock/client và build Lab 5 đạt.
+- **06/11/2026:** Chốt guard tại `ClientView.withLease`: khi acquire lock thất bại hoặc trả lease rỗng, không gọi dialog/action; cập nhật kịch bản demo và contract UI trong tài liệu.
 - **06/11/2026:** Bắt đầu đối chiếu luật lề code và cấu trúc package tối giản phục vụ việc chỉ class/method khi giảng viên hỏi.
 - **06/11/2026:** Hoàn thành đối chiếu `CODING_RULES.md`, `COMMON_ARCHITECTURE.md` và package thực tế; đề xuất giữ ít package nhưng tách rõ UI, nghiệp vụ và I/O thay vì gom vào hai class lớn.
 - **04/11/2026:** Bắt đầu chẩn đoán lỗi không khởi động được server Lab 1 và tổng hợp quy trình chạy Lab 1–5 theo tài liệu hiện có.

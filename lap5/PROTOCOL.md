@@ -4,6 +4,7 @@
 - Warehouse object TCP `1100`, Sync object TCP `1101`, Lock object TCP `1102`.
 - `WarehouseService`: login/register, list/create/update/delete product, changeInventory, transactionHistory, isPeerAvailable.
 - `LockService`: acquire, heartbeat, release, validate; lease mặc định 30 giây, heartbeat client 10 giây.
+- UI chỉ mở dialog Sửa/Nhập kho/Xuất kho sau khi `LockService.acquire` trả về lease hợp lệ; nếu sản phẩm đang bị client khác giữ lease, UI hiển thị lỗi và không mở dialog.
 - `SyncService`: ping, syncUser, syncCreateProduct, syncUpdateProduct, syncDeleteProduct, syncInventory.
 - DTO tuần tự hóa: `Product`, `InventoryTransaction`, `ProductInput`, `LockLease`, `LoginResult`, `RegistrationResult`.
 - Hai server và client phải dùng cùng một build `lab5.*`; không tương thích nhị phân với JAR `com.warehouse.*` cũ.

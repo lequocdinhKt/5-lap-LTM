@@ -49,10 +49,10 @@ public final class LockRepository {
         }
         try (PreparedStatement upsert = connection.prepareStatement(
                 "INSERT INTO product_locks(resource_id,owner_client_id,lock_token,fencing_token,"
-                        + "acquired_at,expires_at) VALUES (?,?,?,?,?,?) AS incoming "
-                        + "ON DUPLICATE KEY UPDATE owner_client_id=incoming.owner_client_id,"
-                        + "lock_token=incoming.lock_token,fencing_token=incoming.fencing_token,"
-                        + "acquired_at=incoming.acquired_at,expires_at=incoming.expires_at")) {
+                        + "acquired_at,expires_at) VALUES (?,?,?,?,?,?) "
+                        + "ON DUPLICATE KEY UPDATE owner_client_id=VALUES(owner_client_id),"
+                        + "lock_token=VALUES(lock_token),fencing_token=VALUES(fencing_token),"
+                        + "acquired_at=VALUES(acquired_at),expires_at=VALUES(expires_at)")) {
             upsert.setString(1, lease.resourceId().toString());
             upsert.setString(2, lease.ownerClientId());
             upsert.setString(3, lease.lockToken().toString());
