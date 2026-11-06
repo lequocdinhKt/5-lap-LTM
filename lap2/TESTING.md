@@ -1,5 +1,11 @@
 # Kiểm thử Lab 2
 
+## Bằng chứng refactor service ngày 06/11/2026
+
+- `FtpClientApp` chỉ gọi `FtpService`; kiểm tra tĩnh không còn tham chiếu `FtpClientSession` trong UI.
+- `FtpIntegrationTest` chạy qua `FtpService` và đạt luồng đăng nhập, upload, LIST, download đúng byte và xóa file trên MySQL local.
+- `run-client.ps1` khởi động được màn hình JavaFX sau refactor; tiến trình được dừng sau smoke test.
+
 ## Build
 
 ```powershell

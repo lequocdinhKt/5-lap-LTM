@@ -5,6 +5,7 @@ import lab1.common.GroupInfo;
 import lab1.common.Protocol;
 import lab1.common.RecipientMode;
 import lab1.server.ChatServer;
+import lab1.service.ChatService;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -72,42 +73,42 @@ public final class ChatIntegrationTest {
             GroupInfo allGroup = awaitGroup(an, "Tất cả");
             clearQueues(clients);
 
-            an.connection.sendText(RecipientMode.DIRECT, List.of(binh.name), "Tin nhắn riêng");
+            an.service.sendText(RecipientMode.DIRECT, List.of(binh.name), "Tin nhắn riêng");
             requireText(an, "Tin nhắn riêng");
             requireText(binh, "Tin nhắn riêng");
             requireNoText(clients.subList(2, clients.size()));
             System.out.println("[PASS] DIRECT chỉ tới người gửi và một người nhận");
 
             clearQueues(clients);
-            an.connection.sendText(RecipientMode.DIRECT, List.of("NguoiDaOffline"), "Không được chuyển");
+            an.service.sendText(RecipientMode.DIRECT, List.of("NguoiDaOffline"), "Không được chuyển");
             requireError(an, "offline");
             requireNoText(clients);
             System.out.println("[PASS] Báo lỗi khi người nhận không còn online");
 
             clearQueues(clients);
-            an.connection.createGroup("Nhóm Java " + suffix, List.of(binh.name));
+            an.service.createGroup("Nhóm Java " + suffix, List.of(binh.name));
             GroupInfo created = awaitGroup(binh, "Nhóm Java " + suffix);
             require(created.membership() == GroupInfo.Membership.MEMBER,
                     "Nguoi duoc chon phai la thanh vien");
             System.out.println("[PASS] Truong nhom chon thanh vien khi tao nhom");
 
             clearQueues(clients);
-            an.connection.sendGroupText(created.id(), "Tin multicast");
+            an.service.sendGroupText(created.id(), "Tin multicast");
             requireGroupText(an, "Tin multicast");
             requireGroupText(binh, "Tin multicast");
             requireNoGroupText(clients.subList(2, clients.size()));
             System.out.println("[PASS] UDP MULTICAST chỉ tới thành viên được chọn");
 
-            an.connection.updateGroupMembers(created.id(), List.of(chi.name));
+            an.service.updateGroupMembers(created.id(), List.of(chi.name));
             awaitMembership(chi, created.id(), GroupInfo.Membership.MEMBER);
-            an.connection.requestGroupMembers(created.id());
+            an.service.requestGroupMembers(created.id());
             GroupMembersEvent updatedMembers = an.groupMembers.poll(2, TimeUnit.SECONDS);
             require(updatedMembers != null && updatedMembers.members.contains(an.name)
                             && updatedMembers.members.contains(chi.name)
                             && !updatedMembers.members.contains(binh.name),
                     "Danh sach thanh vien sau khi sua khong dung");
             clearQueues(clients);
-            an.connection.sendGroupText(created.id(), "Tin sau khi sửa thành viên");
+            an.service.sendGroupText(created.id(), "Tin sau khi sửa thành viên");
             requireGroupText(an, "Tin sau khi sửa thành viên");
             requireGroupText(chi, "Tin sau khi sửa thành viên");
             requireNoGroupText(List.of(binh, clients.get(3), clients.get(4), clients.get(5)));
@@ -118,7 +119,7 @@ public final class ChatIntegrationTest {
             Path audioFile = Files.createTempFile("lap1-audio-", ".mp3");
             Files.write(audioFile, audioData);
             try {
-                an.connection.sendGroupFile(created.id(), audioFile);
+                an.service.sendGroupFile(created.id(), audioFile);
                 FileEvent receivedAudio = requireFile(chi);
                 require(java.util.Arrays.equals(audioData, Files.readAllBytes(receivedAudio.path)),
                         "Audio nhom bi thay doi byte");
@@ -131,13 +132,13 @@ public final class ChatIntegrationTest {
             System.out.println("[PASS] Audio nhóm UDP chỉ tới đúng thành viên và đúng byte");
 
             clearQueues(clients);
-            an.connection.sendGroupText(allGroup.id(), "Xin chào tất cả 😀");
+            an.service.sendGroupText(allGroup.id(), "Xin chào tất cả 😀");
             for (TestClient client : clients) {
                 requireGroupText(client, "Xin chào tất cả 😀");
             }
             System.out.println("[PASS] Nhóm Tất cả BROADCAST tới đủ 6 client");
 
-            an.connection.deleteGroup(created.id());
+            an.service.deleteGroup(created.id());
             for (TestClient client : clients) {
                 require(created.id().equals(client.removedGroups.poll(2, TimeUnit.SECONDS)),
                         client.name + " chưa nhận sự kiện xóa nhóm");
@@ -149,7 +150,7 @@ public final class ChatIntegrationTest {
             Path temporaryFile = Files.createTempFile("lap1-chat-test-", ".bin");
             Files.write(temporaryFile, originalData);
             try {
-                an.connection.sendFile(RecipientMode.DIRECT, List.of(binh.name), temporaryFile);
+                an.service.sendFile(RecipientMode.DIRECT, List.of(binh.name), temporaryFile);
                 FileEvent receiverFile = requireFile(binh);
                 require(java.util.Arrays.equals(originalData, Files.readAllBytes(receiverFile.path)),
                         "File phía người nhận bị thay đổi");
@@ -167,7 +168,7 @@ public final class ChatIntegrationTest {
                 randomAccessFile.setLength(Protocol.MAX_FILE_SIZE + 1);
             }
             try {
-                an.connection.sendFile(RecipientMode.DIRECT, List.of(binh.name), oversizedFile);
+                an.service.sendFile(RecipientMode.DIRECT, List.of(binh.name), oversizedFile);
             } catch (IOException expected) {
                 oversizedRejected = expected.getMessage().contains("20 MB");
             } finally {
@@ -176,12 +177,12 @@ public final class ChatIntegrationTest {
             require(oversizedRejected, "Client phải từ chối file vượt 20 MB trước khi gửi");
             System.out.println("[PASS] Từ chối file vượt giới hạn 20 MB");
 
-            an.connection.createGroup("Nhóm chỉ tồn tại trong RAM " + suffix, List.of(binh.name));
+            an.service.createGroup("Nhóm chỉ tồn tại trong RAM " + suffix, List.of(binh.name));
             awaitGroup(binh, "Nhóm chỉ tồn tại trong RAM " + suffix);
 
             deleteDirectoryIfEmpty(Path.of("received"));
         } finally {
-            clients.forEach(client -> client.connection.close());
+            clients.forEach(client -> client.service.close());
             server.close();
             serverThread.interrupt();
             serverThread.join(3_000);
@@ -195,10 +196,10 @@ public final class ChatIntegrationTest {
         }, "restart-test-server");
         restartThread.start();
         Thread.sleep(500);
-        ClientConnection restored = null;
+        ChatService restored = null;
         try {
-            restored = ClientConnection.connect("localhost", restartTcp, persistedUser,
-                    "lab1-" + persistedUser, false);
+            restored = new ChatService();
+            restored.connect("localhost", restartTcp, persistedUser, "lab1-" + persistedUser, false);
             TestClient restoredClient = new TestClient(persistedUser, restored);
             restored.startListening(restoredClient.listener);
             List<GroupInfo> catalog = restoredClient.groupCatalogs.poll(3, TimeUnit.SECONDS);
@@ -218,9 +219,10 @@ public final class ChatIntegrationTest {
         IOException lastError = null;
         for (int attempt = 0; attempt < 20; attempt++) {
             try {
-                ClientConnection connection = ClientConnection.connect("localhost", port, name);
-                TestClient client = new TestClient(name, connection);
-                connection.startListening(client.listener);
+                ChatService service = new ChatService();
+                service.connectDemo("localhost", port, name);
+                TestClient client = new TestClient(name, service);
+                service.startListening(client.listener);
                 Thread.sleep(100);
                 return client;
             } catch (IOException exception) {
@@ -362,7 +364,7 @@ public final class ChatIntegrationTest {
 
     private static final class TestClient {
         private final String name;
-        private final ClientConnection connection;
+        private final ChatService service;
         private final BlockingQueue<TextEvent> texts = new LinkedBlockingQueue<>();
         private final BlockingQueue<FileEvent> files = new LinkedBlockingQueue<>();
         private final BlockingQueue<String> errors = new LinkedBlockingQueue<>();
@@ -370,7 +372,7 @@ public final class ChatIntegrationTest {
         private final BlockingQueue<GroupTextEvent> groupTexts = new LinkedBlockingQueue<>();
         private final BlockingQueue<GroupMembersEvent> groupMembers = new LinkedBlockingQueue<>();
         private final BlockingQueue<String> removedGroups = new LinkedBlockingQueue<>();
-        private final ClientConnection.Listener listener = new ClientConnection.Listener() {
+        private final ChatService.Listener listener = new ChatService.Listener() {
             @Override
             public void onUserList(List<String> usernames) {
             }
@@ -427,9 +429,9 @@ public final class ChatIntegrationTest {
             }
         };
 
-        private TestClient(String name, ClientConnection connection) {
+        private TestClient(String name, ChatService service) {
             this.name = name;
-            this.connection = connection;
+            this.service = service;
         }
     }
 }

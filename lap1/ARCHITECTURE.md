@@ -2,7 +2,8 @@
 
 ```mermaid
 flowchart LR
-    UI[ChatFxApp] --> C[ClientConnection]
+    UI[ChatFxApp] --> SVC[ChatService]
+    SVC --> C[ClientConnection]
     C -- TCP 5000 --> H[ClientHandler]
     H --> S[ChatServer]
     S --> DB[(MySqlDB)]
@@ -17,6 +18,7 @@ flowchart LR
 ## Thành phần
 
 - `ChatFxApp`: giao diện client, lựa chọn người nhận/nhóm và hiển thị sự kiện.
+- `ChatService`: cửa vào nghiệp vụ của UI; sở hữu kết nối, chuyển lệnh xuống network và chuyển sự kiện về UI.
 - `ClientConnection`: API client TCP, signaling file và listener nhận sự kiện.
 - `ClientUdpText`: nhận multicast/broadcast text.
 - `ClientUdpFiles`: chia/ghép gói file và ACK.
@@ -27,11 +29,11 @@ flowchart LR
 
 ## Luồng chính
 
-1. Client mở TCP và đăng nhập; server đăng ký phiên.
+1. UI gọi `ChatService.connect()`; service mở `ClientConnection`, đăng nhập và đăng ký listener.
 2. Server phát danh sách online và catalog nhóm.
 3. Chat riêng đi qua TCP; chat nhóm/tất cả được server phát qua UDP.
 4. File được báo hiệu bằng TCP, truyền chunk qua UDP và xác nhận ACK/retry.
 
 ## Cấu trúc Maven
 
-Source chính nằm tại `src/main/java/lab1`; integration test và bot demo nằm tại `src/test/java/lab1/test`. Các package `client`, `server`, `common`, `db` được giữ vì phản ánh trực tiếp kiến trúc Chat Client–Server.
+Source chính nằm tại `src/main/java/lab1`; integration test và bot demo nằm tại `src/test/java/lab1/test`. Package `service` là cửa vào của UI; các package `client`, `server`, `common`, `db` giữ trách nhiệm giao thức và dữ liệu hiện có.

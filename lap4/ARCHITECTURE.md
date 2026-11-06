@@ -2,7 +2,8 @@
 
 ```mermaid
 flowchart LR
-    UI[MiniBrowserApp JavaFX] --> C[RawHttpClient]
+    UI[MiniBrowserApp JavaFX] --> SVC[BrowserService]
+    SVC --> C[RawHttpClient]
     C -- TCP 8080 + HTTP/1.1 --> S[MiniWebServer]
     S --> H[ClientHandler]
     H --> Q[HttpRequest.parse]
@@ -10,7 +11,7 @@ flowchart LR
     H --> R[HttpResponse.writeTo]
     F --> W[(www)]
     R --> C
-    C --> BH[BrowserHistory]
+    SVC --> BH[BrowserHistory]
 ```
 
 ## Server
@@ -23,12 +24,13 @@ flowchart LR
 
 ## Client
 
+- `BrowserService`: cửa vào nghiệp vụ; chuẩn hóa URL, gọi HTTP client, quản lý history và lưu file tải xuống.
 - `RawHttpClient`: tạo request raw, parse response và trả `Response`.
 - `BrowserHistory`: model lịch sử URL trong phiên.
-- `MiniBrowserApp`: UI JavaFX có top bar, sidebar history/POST, vùng xem body, loading và toast.
+- `MiniBrowserApp`: UI JavaFX chỉ gọi `BrowserService`, quản lý background task và render kết quả.
 
 ## Cấu trúc Maven
 
-Source nằm tại `src/main/java/lab4`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab4/test`. `RawHttpClient` và integration test không phụ thuộc JavaFX.
+Source nằm tại `src/main/java/lab4`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab4/test`. `BrowserService`, `RawHttpClient` và integration test không phụ thuộc JavaFX.
 
 Response HTML nhỏ vẫn dùng `byte[]`; PDF/MP3/MP4 và file tĩnh được stream trực tiếp từ file đã kiểm tra vào TCP output stream.

@@ -1,5 +1,11 @@
 # Kiểm thử Lab 1
 
+## Bằng chứng refactor service ngày 06/11/2026
+
+- `ChatFxApp` chỉ gọi `ChatService`; kiểm tra tĩnh không còn tham chiếu `ClientConnection` trong UI.
+- `ChatIntegrationTest` chạy qua `ChatService` và đạt toàn bộ 13 nhóm kiểm tra: 6 client, xác thực MySQL, TCP, multicast, broadcast, quản lý nhóm và file UDP đúng byte.
+- `run-client.ps1` khởi động được màn hình JavaFX sau refactor; tiến trình được dừng sau smoke test.
+
 ## Build
 
 ```powershell

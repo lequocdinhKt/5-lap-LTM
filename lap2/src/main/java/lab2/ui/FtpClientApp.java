@@ -38,7 +38,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import lab2.client.FtpClientSession;
+import lab2.service.FtpService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +48,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-/** JavaFX FTP Client: UI chỉ điều phối, giao thức nằm trong FtpClientSession. */
+/** JavaFX FTP Client: UI gọi FtpService, service điều phối lớp giao thức mạng. */
 public final class FtpClientApp extends Application {
     private final TextField hostField = new TextField("localhost");
     private final TextField portField = new TextField("2121");
@@ -61,9 +61,9 @@ public final class FtpClientApp extends Application {
     private final Label localPathLabel = new Label();
     private final Label remotePathLabel = new Label("/");
     private final ObservableList<Path> localItems = FXCollections.observableArrayList();
-    private final ObservableList<FtpClientSession.RemoteEntry> remoteItems = FXCollections.observableArrayList();
+    private final ObservableList<FtpService.RemoteEntry> remoteItems = FXCollections.observableArrayList();
     private final ListView<Path> localList = new ListView<>(localItems);
-    private final ListView<FtpClientSession.RemoteEntry> remoteList = new ListView<>(remoteItems);
+    private final ListView<FtpService.RemoteEntry> remoteList = new ListView<>(remoteItems);
 
     private final TextArea logArea = new TextArea();
     private final Label statusLabel = new Label("Sẵn sàng");
@@ -76,7 +76,7 @@ public final class FtpClientApp extends Application {
     });
 
     private Path localDirectory = Path.of(System.getProperty("user.home")).toAbsolutePath();
-    private FtpClientSession session;
+    private final FtpService ftpService = new FtpService(this::appendLog);
     private List<Node> remoteActions = List.of();
 
     @Override
@@ -158,7 +158,7 @@ public final class FtpClientApp extends Application {
         Button mkdir = secondaryButton("Thư mục mới");
         Button delete = dangerButton("Xóa");
         remoteActions = List.of(remoteUp, refresh, download, mkdir, delete, upload);
-        remoteUp.setOnAction(event -> runRemoteAction(() -> session.changeDirectory(".."), "Đang đổi thư mục"));
+        remoteUp.setOnAction(event -> runRemoteAction(() -> ftpService.changeDirectory(".."), "Đang đổi thư mục"));
         refresh.setOnAction(event -> refreshRemote());
         download.setOnAction(event -> downloadSelected());
         mkdir.setOnAction(event -> createRemoteDirectory());
@@ -167,10 +167,10 @@ public final class FtpClientApp extends Application {
         remoteList.setCellFactory(list -> new RemoteFileCell());
         remoteList.setPlaceholder(new Label("Kết nối để xem file trên server"));
         remoteList.setOnMouseClicked(event -> {
-            FtpClientSession.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
+            FtpService.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2
                     && selected != null && selected.directory()) {
-                runRemoteAction(() -> session.changeDirectory(selected.name()), "Đang mở thư mục");
+                runRemoteAction(() -> ftpService.changeDirectory(selected.name()), "Đang mở thư mục");
             }
         });
         VBox remoteCard = fileCard("FTP Server", remotePathLabel, remoteList,
@@ -238,26 +238,21 @@ public final class FtpClientApp extends Application {
         String host = hostField.getText().trim();
         String username = userField.getText().trim();
         String password = passwordField.getText();
-        FtpClientSession newSession = new FtpClientSession(this::appendLog);
         runTask(() -> {
-            newSession.connect(host, port, username, password);
-            return newSession;
-        }, connectedSession -> {
-            session = connectedSession;
+            ftpService.connect(host, port, username, password);
+            return null;
+        }, ignored -> {
             setConnected(true);
             showToast("Đã kết nối FTP Server", false);
             refreshRemote();
         }, error -> {
-            newSession.close();
+            ftpService.close();
             setConnected(false);
         }, "Đang kết nối tới FTP Server…");
     }
 
     private void disconnect() {
-        if (session != null) {
-            session.close();
-            session = null;
-        }
+        ftpService.close();
         remoteItems.clear();
         remotePathLabel.setText("/");
         setConnected(false);
@@ -280,7 +275,7 @@ public final class FtpClientApp extends Application {
         if (!requireConnection()) {
             return;
         }
-        runTask(() -> new RemoteSnapshot(session.pwd(), session.list()), snapshot -> {
+        runTask(ftpService::browse, snapshot -> {
             remotePathLabel.setText(snapshot.path());
             remoteItems.setAll(snapshot.entries());
         }, ignored -> { }, "Đang tải danh sách trên server…");
@@ -316,7 +311,7 @@ public final class FtpClientApp extends Application {
             return;
         }
         runTask(() -> {
-            session.upload(selected, selected.getFileName().toString(), this::updateTransferProgress);
+            ftpService.upload(selected, selected.getFileName().toString(), this::updateTransferProgress);
             return null;
         }, ignored -> {
             showToast("Tải lên thành công: " + selected.getFileName(), false);
@@ -325,7 +320,7 @@ public final class FtpClientApp extends Application {
     }
 
     private void downloadSelected() {
-        FtpClientSession.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
+        FtpService.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
         if (selected == null || selected.directory()) {
             showMessage("Hãy chọn một file trên server để tải xuống.");
             return;
@@ -335,7 +330,7 @@ public final class FtpClientApp extends Application {
             return;
         }
         runTask(() -> {
-            session.download(selected.name(), target, selected.size(), this::updateTransferProgress);
+            ftpService.download(selected.name(), target, selected.size(), this::updateTransferProgress);
             return null;
         }, ignored -> {
             refreshLocal();
@@ -352,17 +347,17 @@ public final class FtpClientApp extends Application {
         dialog.setHeaderText("Tạo thư mục trên FTP Server");
         dialog.setContentText("Tên thư mục:");
         dialog.showAndWait().map(String::trim).filter(name -> !name.isBlank())
-                .ifPresent(name -> runRemoteAction(() -> session.makeDirectory(name), "Đang tạo thư mục…"));
+                .ifPresent(name -> runRemoteAction(() -> ftpService.createDirectory(name), "Đang tạo thư mục…"));
     }
 
     private void deleteRemoteSelected() {
-        FtpClientSession.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
+        FtpService.RemoteEntry selected = remoteList.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showMessage("Hãy chọn file hoặc thư mục trên server.");
             return;
         }
         if (confirm("Xác nhận xóa", "Xóa " + selected.name() + "?")) {
-            runRemoteAction(() -> session.delete(selected.name(), selected.directory()), "Đang xóa…");
+            runRemoteAction(() -> ftpService.delete(selected.name(), selected.directory()), "Đang xóa…");
         }
     }
 
@@ -414,9 +409,10 @@ public final class FtpClientApp extends Application {
         progressBar.setManaged(busy);
         progressBar.setVisible(busy);
         progressBar.setProgress(busy ? -1 : 0);
-        connectButton.setDisable(busy || session != null);
-        disconnectButton.setDisable(busy || session == null);
-        remoteActions.forEach(node -> node.setDisable(busy || session == null));
+        boolean connected = ftpService.isConnected();
+        connectButton.setDisable(busy || connected);
+        disconnectButton.setDisable(busy || !connected);
+        remoteActions.forEach(node -> node.setDisable(busy || !connected));
     }
 
     private void setConnected(boolean connected) {
@@ -433,7 +429,7 @@ public final class FtpClientApp extends Application {
     }
 
     private boolean requireConnection() {
-        if (session == null || !session.isConnected()) {
+        if (!ftpService.isConnected()) {
             showMessage("Chưa kết nối FTP Server.");
             return false;
         }
@@ -539,8 +535,6 @@ public final class FtpClientApp extends Application {
         launch(args);
     }
 
-    private record RemoteSnapshot(String path, List<FtpClientSession.RemoteEntry> entries) { }
-
     @FunctionalInterface
     private interface CheckedSupplier<T> {
         T get() throws Exception;
@@ -560,9 +554,9 @@ public final class FtpClientApp extends Application {
         }
     }
 
-    private static final class RemoteFileCell extends ListCell<FtpClientSession.RemoteEntry> {
+    private static final class RemoteFileCell extends ListCell<FtpService.RemoteEntry> {
         @Override
-        protected void updateItem(FtpClientSession.RemoteEntry entry, boolean empty) {
+        protected void updateItem(FtpService.RemoteEntry entry, boolean empty) {
             super.updateItem(entry, empty);
             setText(empty || entry == null ? null
                     : (entry.directory() ? "📁  " + entry.name()

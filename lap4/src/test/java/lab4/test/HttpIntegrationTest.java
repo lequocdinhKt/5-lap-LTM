@@ -13,8 +13,8 @@ import java.util.Comparator;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
-import lab4.client.RawHttpClient;
 import lab4.server.MiniWebServer;
+import lab4.service.BrowserService;
 
 /** Integration test không phụ thuộc UI cho HTTP server/client tự cài. */
 public final class HttpIntegrationTest {
@@ -39,29 +39,29 @@ public final class HttpIntegrationTest {
 
         try {
             awaitServer(port);
-            RawHttpClient client = new RawHttpClient();
+            BrowserService client = new BrowserService();
             String baseUrl = "http://127.0.0.1:" + port;
 
-            RawHttpClient.Response get = client.get(baseUrl + "/");
-            require(get.getStatusCode() == 200, "GET / phải trả 200");
-            require(new String(get.getBody(), StandardCharsets.UTF_8).contains("Xin chào HTTP"),
+            BrowserService.PageResult get = client.get(baseUrl + "/");
+            require(get.statusCode() == 200, "GET / phải trả 200");
+            require(new String(get.body(), StandardCharsets.UTF_8).contains("Xin chào HTTP"),
                     "GET / phải trả đúng HTML");
 
-            RawHttpClient.Response head = client.head(baseUrl + "/sample.pdf");
-            require(head.getStatusCode() == 200, "HEAD file phải trả 200");
-            require(head.getBody().length == 0, "HEAD không được có body");
-            require("5".equals(head.getHeader("content-length")), "HEAD phải giữ Content-Length");
+            BrowserService.PageResult head = client.head(baseUrl + "/sample.pdf");
+            require(head.statusCode() == 200, "HEAD file phải trả 200");
+            require(head.body().length == 0, "HEAD không được có body");
+            require("5".equals(head.header("content-length")), "HEAD phải giữ Content-Length");
 
-            RawHttpClient.Response streamedFile = client.get(baseUrl + "/sample.pdf");
-            require(Arrays.equals(new byte[] {1, 2, 3, 4, 5}, streamedFile.getBody()),
+            BrowserService.PageResult streamedFile = client.get(baseUrl + "/sample.pdf");
+            require(Arrays.equals(new byte[] {1, 2, 3, 4, 5}, streamedFile.body()),
                     "GET file stream phải giữ nguyên từng byte");
 
-            RawHttpClient.Response post = client.postForm(baseUrl + "/submit", "An", "Xin chào");
-            require(post.getStatusCode() == 200, "POST /submit phải trả 200");
-            require(new String(post.getBody(), StandardCharsets.UTF_8).contains("Xin chào"),
+            BrowserService.PageResult post = client.post(baseUrl, "An", "Xin chào");
+            require(post.statusCode() == 200, "POST /submit phải trả 200");
+            require(new String(post.body(), StandardCharsets.UTF_8).contains("Xin chào"),
                     "POST phải phản hồi dữ liệu form");
 
-            require(client.get(baseUrl + "/missing").getStatusCode() == 404,
+            require(client.get(baseUrl + "/missing").statusCode() == 404,
                     "Tài nguyên thiếu phải trả 404");
             require(rawStatus(port, "PUT / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n") == 405,
                     "Method không hỗ trợ phải trả 405");

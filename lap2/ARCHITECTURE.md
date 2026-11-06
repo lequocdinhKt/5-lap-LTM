@@ -2,7 +2,8 @@
 
 ```mermaid
 flowchart LR
-    UI[FtpClientApp JavaFX] --> C[FtpClientSession]
+    UI[FtpClientApp JavaFX] --> SVC[FtpService]
+    SVC --> C[FtpClientSession]
     C -- control TCP 2121 --> H[ControlHandler]
     C -- data TCP PASV/PORT --> D[DataChannel]
     H --> D
@@ -14,6 +15,7 @@ flowchart LR
 ## Thành phần
 
 - `FtpClientApp`: UI JavaFX, trạng thái kết nối, progress transfer, toast và thao tác nền.
+- `FtpService`: cửa vào nghiệp vụ của UI; sở hữu phiên FTP và trả DTO thư mục độc lập với lớp protocol.
 - `FtpClientSession`: gửi lệnh, đọc reply và mở data connection.
 - `FtpServer`: accept control connection, tạo `ControlHandler` trong thread pool.
 - `ControlHandler`: state machine phiên FTP và dispatch lệnh.
@@ -30,4 +32,4 @@ flowchart LR
 
 ## Cấu trúc Maven
 
-Source nằm tại `src/main/java/lab2`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab2/test`. `FtpClientSession` không phụ thuộc JavaFX nên integration test kiểm tra protocol độc lập UI.
+Source nằm tại `src/main/java/lab2`, CSS tại `src/main/resources/css`, test tại `src/test/java/lab2/test`. `FtpService` và `FtpClientSession` không phụ thuộc JavaFX; UI chỉ quản lý hiển thị và background task.

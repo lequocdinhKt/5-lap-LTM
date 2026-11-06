@@ -1,5 +1,11 @@
 # Kiểm thử Lab 4
 
+## Bằng chứng refactor service ngày 06/11/2026
+
+- `MiniBrowserApp` chỉ gọi `BrowserService`; kiểm tra tĩnh không còn tham chiếu `RawHttpClient` hoặc `BrowserHistory` trong UI.
+- `HttpIntegrationTest` chạy qua `BrowserService` và đạt GET stream, HEAD, POST, 404, 405 và chặn path traversal.
+- `run-client.ps1` khởi động được màn hình JavaFX sau refactor; còn cảnh báo CSS `-fx-font-weight` đã có sẵn, không ảnh hưởng việc mở ứng dụng.
+
 ## Build
 
 ```powershell

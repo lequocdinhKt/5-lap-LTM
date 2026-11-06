@@ -1,8 +1,6 @@
 # Tiến độ dự án 5 Lab Lập trình mạng
 
-- [x] ✅ **03/11/2026:** Đã nhập mã nguồn kho RMI vào `lap5`; chỉ cập nhật Lab 5 và tài liệu trạng thái chung. Không thay đổi Lab 1–4. Đã có bằng chứng 49 unit test và 43 kiểm tra MariaDB/RMI trên máy A; Maven clean verify với JDK 21 đã thành công (49 test); chưa nghiệm thu LAN.
-
-Cập nhật gần nhất: **04/11/2026**
+Cập nhật gần nhất: **06/11/2026**
 
 Baseline Lab 5 đã khóa: commit `b30d3ee` (`origin/main`), triển khai trên nhánh `codex/lab5-standardize`.
 
@@ -29,9 +27,9 @@ Trạng thái hiện tại: **Lab 1–5 build sạch bằng JDK 21; Lab 1, Lab 2
 
 ## Việc đang làm
 
-Hiện **không có task code đang chạy**. Lab 5 đã chuyển sang JavaFX, package `lab5.*`, MySQL Connector/J, repository/transaction manager, service bất đồng bộ và script PowerShell. `verify-all.ps1` đã build Lab 1–5 và chạy integration Lab 3/4 thành công trên JDK 25; riêng Lab 5 có 52 test, 51 đạt và 1 integration test bị skip theo cờ môi trường.
+- [x] ✅ Đã refactor tối giản Lab 1, 2 và 4 theo luồng `UI → service → network/db`; thêm `ChatService`, `FtpService`, `BrowserService`, giữ nguyên giao thức, cổng và giao diện. Cả ba lab `clean verify` thành công; ba integration test chạy qua service mới đều đạt.
 
-Bước tiếp theo: dựng topology bốn máy theo `DEMO_TOPOLOGY.md`, chụp ảnh và quay video bảo vệ.
+Bước tiếp theo: demo hai máy và kiểm tra trực quan đầy đủ các thao tác UI; riêng Lab 4 có cảnh báo CSS `-fx-font-weight` cũ cần xử lý trong một task giao diện riêng nếu muốn log sạch.
 
 ## Hạ tầng và tài liệu chung
 
@@ -140,6 +138,15 @@ Bước tiếp theo: dựng topology bốn máy theo `DEMO_TOPOLOGY.md`, chụp 
 - **04/11/2026:** Loại bỏ Swing/AWT còn sót trong Lab 5, sửa CSS font-weight, mở smoke hai JavaFX window thành công và chuyển thao tác đóng RMI/database ra background service.
 - **04/11/2026:** Tìm thấy Microsoft OpenJDK 21.0.12.1 cục bộ; chạy `verify-all.ps1` bằng đúng JDK 21, cả Lab 1–5 cùng integration Lab 3/4 đều đạt.
 - **04/11/2026:** Chạy lại `lap5/run-integration-tests.ps1` bằng Microsoft OpenJDK 21.0.12.1 trên MySQL80 local; toàn bộ ma trận hai RMI server đạt, script trả mã `0` và dọn hai schema tạm.
+- **06/11/2026:** Bắt đầu refactor Lab 1, 2 và 4 theo kiến trúc service mỏng; không thay đổi Lab 3, Lab 5 hoặc protocol.
+- **06/11/2026:** Hoàn thành refactor `ChatService`, `FtpService`, `BrowserService`; UI không còn gọi trực tiếp lớp network. `clean verify` của Lab 1/2/4 thành công; `ChatIntegrationTest`, `FtpIntegrationTest`, `HttpIntegrationTest` đều đạt qua service mới; ba client JavaFX khởi động được.
+- **06/11/2026:** Bắt đầu rà soát cách chạy 5 lab trên VirtualBox/Tiny10; ưu tiên xác định topology đúng theo yêu cầu Lab 5 và không sửa mã nguồn.
+- **06/11/2026:** Hoàn thành rà soát tài liệu chạy, cổng và cấu hình; kết luận Lab 1–4 có thể dùng máy thật làm server và VM làm client, còn Lab 5 khi nghiệm thu phải dùng hai server trên hai máy thật và hai client trên hai VM.
+- **06/11/2026:** Bắt đầu đối chiếu luật lề code và cấu trúc package tối giản phục vụ việc chỉ class/method khi giảng viên hỏi.
+- **06/11/2026:** Hoàn thành đối chiếu `CODING_RULES.md`, `COMMON_ARCHITECTURE.md` và package thực tế; đề xuất giữ ít package nhưng tách rõ UI, nghiệp vụ và I/O thay vì gom vào hai class lớn.
+- **04/11/2026:** Bắt đầu chẩn đoán lỗi không khởi động được server Lab 1 và tổng hợp quy trình chạy Lab 1–5 theo tài liệu hiện có.
+- **04/11/2026:** Xác nhận Lab 1 dừng với `Khong doc duoc db.properties`; ghi nhận Docker daemon chưa chạy, TCP 3306 đang bị tiến trình khác chiếm và JDK hiện tại là 25.0.2.
+- **04/11/2026:** Đính chính hướng dẫn: Lab 1–3 hỗ trợ MySQL local bằng `-SkipDocker`; Lab 4 không dùng database; Lab 5 dùng MariaDB local riêng cho hai server.
 
 - **02/11/2026:** Tạo `PROGRESS.md`; ghi nhận môi trường và project harness đã hoàn thành, các giai đoạn code/UI/demo chưa bắt đầu.
 - **02/11/2026:** Bắt đầu Giai đoạn 3 — chuẩn hóa Maven layout/package cho Lab 1–4, sau đó JavaFX hóa Lab 2 và Lab 4.

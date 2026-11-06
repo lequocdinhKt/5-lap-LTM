@@ -1,6 +1,6 @@
 package lab2.test;
 
-import lab2.client.FtpClientSession;
+import lab2.service.FtpService;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -20,12 +20,13 @@ public final class FtpIntegrationTest {
         String remoteName = "integration-" + System.currentTimeMillis() + ".txt";
         Files.write(source, expected);
 
-        try (FtpClientSession client = new FtpClientSession(System.out::println)) {
+        try (FtpService client = new FtpService(System.out::println)) {
             client.connect(host, port, "alice", "123456");
-            client.upload(source, remoteName);
-            boolean listed = client.list().stream().anyMatch(entry -> entry.name().equals(remoteName));
+            client.upload(source, remoteName, null);
+            boolean listed = client.browse().entries().stream()
+                    .anyMatch(entry -> entry.name().equals(remoteName));
             require(listed, "LIST không thấy file vừa upload");
-            client.download(remoteName, downloaded);
+            client.download(remoteName, downloaded, expected.length, null);
             require(Arrays.equals(expected, Files.readAllBytes(downloaded)), "RETR không khớp byte");
             client.delete(remoteName, false);
         } finally {

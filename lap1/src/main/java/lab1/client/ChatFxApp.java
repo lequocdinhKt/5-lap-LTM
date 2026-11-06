@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import lab1.common.GroupInfo;
 import lab1.common.Protocol;
 import lab1.common.RecipientMode;
+import lab1.service.ChatService;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -28,14 +29,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-/** Giao dien chat; moi thao tac mang deu di qua ClientConnection. */
-public final class ChatFxApp extends Application implements ClientConnection.Listener {
+/** Giao diện chat; mọi thao tác nghiệp vụ đều đi qua ChatService. */
+public final class ChatFxApp extends Application implements ChatService.Listener {
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm")
             .withZone(ZoneId.systemDefault());
     private static final String[] EMOJIS = {"😀", "😂", "😍", "👍", "❤️", "🎉", "😢", "😮"};
 
     private Stage stage;
-    private ClientConnection connection;
+    private final ChatService chatService = new ChatService();
     private final ListView<String> users = new ListView<>();
     private final ListView<GroupInfo> groups = new ListView<>();
     private final VBox messages = new VBox(7);
@@ -136,26 +137,25 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
             showError("Vui lòng nhập đủ thông tin.");
             return;
         }
-        connectAsync(() -> ClientConnection.connect(host, port, username, password, register));
+        connectAsync(() -> chatService.connect(host, port, username, password, register));
     }
 
     /** Tài khoản demo cho script: mật khẩu quy ước "lab1-<tên>", tự đăng ký nếu chưa tồn tại. */
     private void connectDemoAccount(String host, int port, String username) {
-        connectAsync(() -> ClientConnection.connect(host, port, username));
+        connectAsync(() -> chatService.connectDemo(host, port, username));
     }
 
-    private void connectAsync(IoSupplier<ClientConnection> attempt) {
+    private void connectAsync(IoAction attempt) {
         status.setText("Đang kết nối TCP...");
         setBusy(true);
-        CompletableFuture.supplyAsync(() -> {
-            try { return attempt.get(); }
+        CompletableFuture.runAsync(() -> {
+            try { attempt.run(); }
             catch (IOException exception) { throw new RuntimeException(exception); }
-        }).whenComplete((connected, error) -> Platform.runLater(() -> {
+        }).whenComplete((ignored, error) -> Platform.runLater(() -> {
             setBusy(false);
             if (error != null) { setStatus("Kết nối thất bại", "status-error"); showError(rootMessage(error)); return; }
-            connection = connected;
             showChat();
-            connection.startListening(this);
+            chatService.startListening(this);
         }));
     }
 
@@ -208,9 +208,9 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         conversationTitle.getStyleClass().add("conversation-title");
         deleteButton.getStyleClass().add("danger-button");
         membersButton.setOnAction(event -> withGroup(group ->
-                runIo(() -> connection.requestGroupMembers(group.id()), "Đã tải thành viên.")));
+                runIo(() -> chatService.requestGroupMembers(group.id()), "Đã tải thành viên.")));
         leaveButton.setOnAction(event -> withGroup(group ->
-                runIo(() -> connection.leaveGroup(group.id()), "Đã rời nhóm.")));
+                runIo(() -> chatService.leaveGroup(group.id()), "Đã rời nhóm.")));
         deleteButton.setOnAction(event -> withGroup(this::confirmDelete));
 
         messages.setPadding(new Insets(10));
@@ -251,8 +251,8 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         stage.setMinWidth(760);
         stage.setMinHeight(560);
         stage.setScene(scene);
-        stage.setTitle("Lab 1 Chat - " + connection.username());
-        stage.setOnCloseRequest(event -> connection.close());
+        stage.setTitle("Lab 1 Chat - " + chatService.username());
+        stage.setOnCloseRequest(event -> chatService.close());
         updateControls();
     }
 
@@ -274,7 +274,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.showAndWait().filter(ButtonType.OK::equals).ifPresent(button -> {
             String value = name.getText().trim();
-            if (!value.isEmpty()) runIo(() -> connection.createGroup(value, selectedMembers(memberBox)),
+            if (!value.isEmpty()) runIo(() -> chatService.createGroup(value, selectedMembers(memberBox)),
                     "Đã tạo nhóm multicast.");
         });
     }
@@ -284,7 +284,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         names.addAll(users.getItems());
         VBox box = new VBox(6);
         for (String name : names) {
-            if (name.equals(connection.username())) continue;
+            if (name.equals(chatService.username())) continue;
             CheckBox check = new CheckBox(name);
             check.setSelected(selected.contains(name));
             box.getChildren().add(check);
@@ -306,7 +306,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
                 new Label("Chọn người được nhận multicast:"), checks));
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         dialog.showAndWait().filter(ButtonType.OK::equals).ifPresent(button ->
-                runIo(() -> connection.updateGroupMembers(groupId, selectedMembers(checks)),
+                runIo(() -> chatService.updateGroupMembers(groupId, selectedMembers(checks)),
                         "Đã cập nhật thành viên."));
     }
 
@@ -314,7 +314,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Xóa nhóm '" + group.name() + "'?", ButtonType.YES, ButtonType.NO);
         if (confirm.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
-            runIo(() -> connection.deleteGroup(group.id()), "Đã xóa nhóm.");
+            runIo(() -> chatService.deleteGroup(group.id()), "Đã xóa nhóm.");
         }
     }
 
@@ -332,10 +332,10 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         if (text.isEmpty() || activeKey == null) return;
         messageField.clear();
         if (activeKey.startsWith("user:")) {
-            runIo(() -> connection.sendText(RecipientMode.DIRECT,
+            runIo(() -> chatService.sendText(RecipientMode.DIRECT,
                     List.of(activeKey.substring(5)), text), "Đã gửi bằng TCP.");
         } else {
-            runIo(() -> connection.sendGroupText(activeKey.substring(6), text),
+            runIo(() -> chatService.sendGroupText(activeKey.substring(6), text),
                     "Đã phát UDP (best effort, không ACK).");
         }
     }
@@ -353,10 +353,10 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
         Path file = selected.toPath();
         String key = activeKey;
         IoAction action = key.startsWith("user:")
-                ? () -> connection.sendFile(RecipientMode.DIRECT, List.of(key.substring(5)), file)
-                : () -> connection.sendGroupFile(key.substring(6), file);
+                ? () -> chatService.sendFile(RecipientMode.DIRECT, List.of(key.substring(5)), file)
+                : () -> chatService.sendGroupFile(key.substring(6), file);
         runIo(action, "Đã gửi " + AttachmentKind.of(file).display + " bằng UDP có ACK.", () ->
-                append(key, new MessageView(connection.username(), System.currentTimeMillis(),
+                append(key, new MessageView(chatService.username(), System.currentTimeMillis(),
                         AttachmentKind.of(file).icon + " " + file.getFileName(), file,
                         AttachmentKind.of(file))));
     }
@@ -377,7 +377,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     }
 
     private void addBubble(MessageView message) {
-        boolean mine = connection.username().equals(message.sender());
+        boolean mine = chatService.username().equals(message.sender());
         Label head = new Label((mine ? "Bạn" : message.sender()) + " • "
                 + TIME.format(Instant.ofEpochMilli(message.time())));
         Label body = new Label(message.text());
@@ -470,7 +470,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
 
     @Override public void onUserList(List<String> names) {
         Platform.runLater(() -> users.setItems(FXCollections.observableArrayList(
-                names.stream().filter(name -> !name.equals(connection.username())).toList())));
+                names.stream().filter(name -> !name.equals(chatService.username())).toList())));
     }
     @Override public void onSystemMessage(String message) {
         Platform.runLater(() -> {
@@ -495,7 +495,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     }
 
     private String directPartner(String sender, List<String> targets) {
-        return sender.equals(connection.username()) ? targets.get(0) : sender;
+        return sender.equals(chatService.username()) ? targets.get(0) : sender;
     }
 
     @Override
@@ -592,7 +592,7 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
     private void showError(String message) {
         new Alert(Alert.AlertType.ERROR, message == null ? "Có lỗi xảy ra." : message).showAndWait();
     }
-    @Override public void stop() { if (connection != null) connection.close(); }
+    @Override public void stop() { chatService.close(); }
 
     private static boolean hasFlag(List<String> args, String flag) {
         return args.stream().anyMatch(value -> flag.equalsIgnoreCase(value));
@@ -623,6 +623,5 @@ public final class ChatFxApp extends Application implements ClientConnection.Lis
             return FILE;
         }
     }
-    @FunctionalInterface private interface IoSupplier<T> { T get() throws IOException; }
     @FunctionalInterface private interface IoAction { void run() throws IOException; }
 }

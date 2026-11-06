@@ -5,8 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,13 +45,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import lab4.client.RawHttpClient;
-import lab4.model.BrowserHistory;
+import lab4.service.BrowserService;
 
-/** Mini Browser JavaFX; mọi request vẫn đi qua RawHttpClient tự cài trên TCP socket. */
+/** Mini Browser JavaFX; mọi thao tác HTTP và lịch sử đều đi qua BrowserService. */
 public final class MiniBrowserApp extends Application {
-    private final RawHttpClient httpClient = new RawHttpClient();
-    private final BrowserHistory history = new BrowserHistory();
+    private final BrowserService browserService = new BrowserService();
     private final ExecutorService worker = Executors.newSingleThreadExecutor(runnable -> {
         Thread thread = new Thread(runnable, "http-client-worker");
         thread.setDaemon(true);
@@ -219,29 +215,25 @@ public final class MiniBrowserApp extends Application {
 
     private void sendGet() {
         String url = normalizedCurrentUrl();
-        executeRequest(url, () -> httpClient.get(url));
+        executeRequest(() -> browserService.get(url));
     }
 
     private void sendHead() {
         String url = normalizedCurrentUrl();
-        executeRequest(url, () -> httpClient.head(url));
+        executeRequest(() -> browserService.head(url));
     }
 
     private void sendPost() {
-        try {
-            String url = submitUrlFor(normalizedCurrentUrl());
-            executeRequest(url, () -> httpClient.postForm(url, nameField.getText(), messageArea.getText()));
-        } catch (IOException error) {
-            showError(error);
-        }
+        String url = normalizedCurrentUrl();
+        executeRequest(() -> browserService.post(url, nameField.getText(), messageArea.getText()));
     }
 
-    private void executeRequest(String url, RequestOperation request) {
+    private void executeRequest(RequestOperation request) {
         runTask(request::execute, response -> {
-            addHistory(url);
+            refreshHistory(response.url());
             displayResponse(response);
-            setConnectionState(response.isSuccessful(), response.statusLine());
-        }, "Đang gửi request tới " + url);
+            setConnectionState(response.successful(), response.statusLine());
+        }, "Đang gửi HTTP request");
     }
 
     private void downloadCurrentUrl() {
@@ -255,17 +247,11 @@ public final class MiniBrowserApp extends Application {
         }
 
         runTask(() -> {
-            RawHttpClient.Response response = httpClient.get(url);
-            if (!response.isSuccessful()) {
-                throw new IOException("Server trả về " + response.statusLine());
-            }
-            byte[] body = response.getBody();
-            Files.write(destination.toPath(), body);
-            return new DownloadResult(response, destination.toPath(), body.length);
+            return browserService.download(url, destination.toPath());
         }, result -> {
-            addHistory(url);
-            displayResponse(result.response());
-            setConnectionState(true, result.response().statusLine());
+            refreshHistory(result.page().url());
+            displayResponse(result.page());
+            setConnectionState(true, result.page().statusLine());
             showToast("Đã lưu " + readableBytes(result.bytes()) + " vào " + result.path().getFileName(), false);
         }, "Đang tải xuống " + url);
     }
@@ -290,10 +276,10 @@ public final class MiniBrowserApp extends Application {
         worker.execute(task);
     }
 
-    private void displayResponse(RawHttpClient.Response response) {
+    private void displayResponse(BrowserService.PageResult response) {
         headersArea.setText(response.headersAsText());
         headersArea.positionCaret(0);
-        byte[] body = response.getBody();
+        byte[] body = response.body();
         statusLabel.setText(response.statusLine() + " · " + readableBytes(body.length));
 
         if (body.length == 0) {
@@ -302,7 +288,7 @@ public final class MiniBrowserApp extends Application {
             return;
         }
 
-        String contentType = response.getHeader("content-type");
+        String contentType = response.header("content-type");
         String normalized = contentType == null ? "" : contentType.toLowerCase(Locale.ROOT);
         if (normalized.startsWith("text/")) {
             contentArea.setText(new String(body, charsetFrom(contentType)));
@@ -314,34 +300,16 @@ public final class MiniBrowserApp extends Application {
         }
     }
 
-    private void addHistory(String url) {
-        history.add(url);
-        historyList.getItems().setAll(history.getUrls());
-        urlBox.getItems().setAll(history.getUrls());
+    private void refreshHistory(String url) {
+        historyList.getItems().setAll(browserService.history());
+        urlBox.getItems().setAll(browserService.history());
         urlBox.setValue(url);
     }
 
     private String normalizedCurrentUrl() {
-        String url = urlBox.getEditor().getText().trim();
-        if (url.isEmpty()) {
-            url = "http://localhost:8080/";
-        } else if (!url.contains("://")) {
-            url = "http://" + url;
-        }
+        String url = browserService.normalize(urlBox.getEditor().getText());
         urlBox.getEditor().setText(url);
         return url;
-    }
-
-    private static String submitUrlFor(String baseUrl) throws IOException {
-        try {
-            URI base = new URI(baseUrl);
-            if (!"http".equalsIgnoreCase(base.getScheme()) || base.getHost() == null) {
-                throw new IOException("URL phải bắt đầu bằng http:// và có host");
-            }
-            return new URI("http", null, base.getHost(), base.getPort(), "/submit", null, null).toString();
-        } catch (URISyntaxException error) {
-            throw new IOException("URL không hợp lệ", error);
-        }
     }
 
     private static String suggestedFileName(String url) {
@@ -458,11 +426,9 @@ public final class MiniBrowserApp extends Application {
         launch(args);
     }
 
-    private record DownloadResult(RawHttpClient.Response response, Path path, int bytes) { }
-
     @FunctionalInterface
     private interface RequestOperation {
-        RawHttpClient.Response execute() throws Exception;
+        BrowserService.PageResult execute() throws Exception;
     }
 
     @FunctionalInterface
